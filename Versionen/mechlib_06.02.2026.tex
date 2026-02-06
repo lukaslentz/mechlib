@@ -1,0 +1,385 @@
+% =========================================================
+% TikZ / Mathe / Farben – Stylesammlung
+% (Formatierung aufgeräumt, kommentiert; Inhalt unverändert)
+% =========================================================
+
+% --- Mathe / Einheiten / Farben ---
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+
+% --- TikZ Libraries ---
+\usetikzlibrary{
+	arrows.meta,
+	calc,
+	patterns,
+	patterns.meta,
+	intersections,
+	angles,
+	quotes,
+	shapes.geometric,
+	shadings
+}
+
+% --- Farbschema ---
+\definecolor{ucbblue}{RGB}{6,13,141}
+\definecolor{ucbgreen}{RGB}{67,176,42}
+\definecolor{mmdblue}{rgb}{0.2,0.2,0.7}
+\definecolor{tured}{rgb}{0.7,0.1,0.1}
+
+% --- Standardfont in TikZ-Bildern ---
+\tikzset{
+	every picture/.style={font=\fontsize{10}{10}\selectfont}
+}
+
+% --- Standard-Schrift: serifenlos (Text im Dokument) ---
+\renewcommand{\familydefault}{\sfdefault}
+
+
+% =========================================================
+% Mechanical Elements
+% =========================================================
+
+% ------------------ Farbstile ------------------
+% Körper / Bauteile
+\tikzset{
+	body/.style={
+		black,
+		fill=gray!40
+	},
+}
+
+% Lager / Auflager
+\tikzset{
+	support/.style={
+		black,
+		fill=gray!30
+	},
+}
+
+% Lasten (distributed loads)
+\tikzset{
+	dl/.style={
+		red
+	},
+	dl_fill/.style={
+		opacity=0.2,
+		red!50
+	},
+}
+
+% ------------------ Ball ------------------
+% Pic: ball
+% Parameter: #1 Radius, #2 Farbe
+\tikzset{
+	pics/ball/.style args={#1,#2}{%
+		code={
+			\shade[ball color=#2, shading angle=0, draw=none] (0,0) circle [radius=#1];
+		}
+	},
+	pics/ball/.default={0.5,red},
+}
+
+% ------------------ Beam ------------------
+% Pic: beam
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Höhe (Offset in y)
+\tikzset{
+	pics/beam/.style args={#1,#2,#3}{%
+		code={
+			\path let \p1=(#1), \p2=(#2) in
+			coordinate (-A) at (\x1, \y1)
+			coordinate (-B) at (\x2, \y2 + #3);
+			\draw[body] (-A) rectangle (-B);
+		}
+	},
+	pics/beam/.default={(0,0),(1,0),0.3},
+}
+
+
+% =========================================================
+% Supports
+% =========================================================
+
+% ------------------ Roller (Loslager) ------------------
+% Pic: roller
+% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
+\tikzset{
+	pics/roller/.style args={#1,#2,#3}{
+		code={
+			\def\mlw{0.2cm} \def\mlh{0.2cm} \def\mlr{0.06cm}
+			% Lagerdreieck
+			\draw[support] (0,0) -- (-0.5*\mlw, \mlh-1pt) --+ (\mlw,0) -- cycle;
+			\draw[support] (0,0) circle (\mlr);
+			
+			% Schraffierte Bodenplatte
+			\fill[
+			pattern={Lines[angle=#3, distance={1pt}]},
+			pattern color=black
+			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
+			
+			\draw (-0.5*\mlw, \mlh) -- (0.5*\mlw, \mlh);
+		}
+	},
+	pics/roller/.default = {0.3cm,0.2cm,45},
+}
+
+% ------------------ Pined (Gelenklager) ------------------
+% Pic: pined
+% Parameter: #1, #2 (aktuell nicht genutzt), #3 Schraffurwinkel
+\tikzset{
+	pics/pined/.style args={#1,#2,#3}{
+		code={
+			\def\mlw{0.2cm}
+			\def\mlh{0.2cm}
+			\def\mlr{0.06cm}
+			\draw[support] (0,0) -- (-0.5*\mlw, \mlh) --+ (\mlw,0) -- cycle;
+			\draw[support] (0,0) circle (\mlr);
+			
+			\fill[
+			pattern={Lines[angle=#3, distance={1pt}]},
+			pattern color=black
+			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
+		}
+	},
+	pics/pined/.default = {1cm,1cm,45},
+}
+
+% ------------------ Fixed Support (Einspannung) ------------------
+% Pic: fixed
+% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
+\tikzset{
+	pics/fixed/.style args={#1,#2,#3}{
+		code={
+			\def\mlw{#1}
+			\def\mlh{#2}
+			\draw[] (-0.5*\mlw,0) -- (0.5*\mlw,0);
+			\fill[
+			pattern={Lines[angle=#3, distance={3pt/sqrt(2)}]},
+			pattern color=black
+			] (-0.5*\mlw,0) rectangle (0.5*\mlw,-\mlh);
+		}
+	},
+	pics/fixed/.default = {1cm,0.1cm,45},
+}
+
+
+% =========================================================
+% Loads
+% =========================================================
+
+% ------------------ Point Force ------------------
+% Pic: f
+% Parameter: #1 Bezugspunkt, #2 (aktuell nicht genutzt)
+% (Hinweis: Der Draw-Befehl ist hier wie im Original unvollständig.)
+\tikzset{
+	pics/f/.style args={#1,#2}{
+		code={
+			\path let \p1=(#1) in
+			coordinate (F) at (\x1, \y1);
+			\draw[-latex,red]
+		}
+	},
+	pics/f/.default = {0.7cm,0.3cm},
+}
+
+% ------------------ Uniformly Distributed Load ------------------
+% Pic: dl_uniform
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Höhe der Lastdarstellung
+\tikzset{
+	pics/dl_uniform/.style args={#1,#2,#3,#4}{
+		code={
+			\path let \p1=(#1), \p2=(#2) in
+			coordinate (-A) at (\x1, \y1 + #3)
+			coordinate (-B) at (\x2, \y2 + #3);
+			
+			\fill[dl_fill] (-A) rectangle ($(-B) + (0,#4)$);
+			
+			\draw[dl]
+			($(-A) + (0,.5*#4)$) -- ($(-A) + (0,#4)$) -- ($(-B) + (0,#4)$) -- ($(-B) + (0,.5*#4)$);
+			
+			\foreach \dx in {0,0.2,...,1}{
+				\draw[-latex,dl] ($(-A)!\dx!(-B) + (0,#4)$) -- +(0,-#4);
+			}
+			
+			\node[anchor=south,dl] at ($(-B) + (0,#4)$) {$q_0$};
+		}
+	},
+	pics/dl_uniform/.default = {(0,0),(1,0),0.3cm,0.8cm},
+}
+
+% ------------------ Linearly Distributed Load ------------------
+% Pic: dl_linear
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Maximalhöhe
+\tikzset{
+	pics/dl_linear/.style args={#1,#2,#3,#4}{
+		code={
+			\path let \p1=(#1), \p2=(#2) in
+			coordinate (-A) at (\x1, \y1 + #3)
+			coordinate (-B) at (\x2, \y2 + #3);
+			
+			\fill[opacity=0.2] (-A) -- ($(-B) + (0,#4)$) -- (-B) -- cycle;
+			
+			\draw (-A) -- ($(-B) + (0,#4)$) -- ($(-B) + (0,.5*#4)$);
+			
+			\foreach \dx in {0.2,0.4,...,1}{
+				\draw[-latex] ($(-A)!\dx!(-B) + (0,\dx*#4)$) -- +(0,-\dx*#4);
+			}
+			
+			\node[anchor=south] at ($(-B) + (0,#4)$) {$q_0$};
+		}
+	},
+	pics/dl_linear/.default = {(0,0),(1,0),0.3cm,0.8cm},
+}
+
+
+% =========================================================
+% Dimensions
+% =========================================================
+
+% ------------------ Arc Dimension ------------------
+% Pic: adim
+% Parameter: #1 Startwinkel, #2 Endwinkel, #3 Text, #4 Radius
+\tikzset{
+	pics/adim/.style args={#1,#2,#3,#4}{%
+		code={
+			\def\mlr{#4}
+			\draw[] (#1:\mlr) arc (#1:#2:\mlr);
+			\node[] at (.5*#1 + .5*#2 :.7*\mlr){#3};
+		}
+	},
+	pics/adim/.default={0,45,{$\alpha$},.7cm},
+}
+
+% ------------------ Horizontal Dimension ------------------
+% Pic: hdim
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Text, #4 Offset in y
+\tikzset{
+	pics/hdim/.style args={#1,#2,#3,#4}{%
+		code={
+			\path let \p1=(#1), \p2=(#2) in
+			coordinate (-A) at (\x1, \y1 + #4)
+			coordinate (-B) at (\x2, \y2 + #4);
+			
+			\draw[latex-latex, line width=0.5pt] (-A) -- (-B)
+			node[pos=0.5, below]{#3};
+		}
+	},
+	pics/hdim/.default={(0,0),(1,0),{$l$},0.3cm},
+}
+
+
+% =========================================================
+% Coordinate Systems
+% =========================================================
+
+% ------------------ x/y Koordinatensystem ------------------
+% Pic: xy_cos
+% Parameter: #1 x-Länge, #2 y-Länge
+\tikzset{
+	pics/xy_cos/.style args={#1,#2}{
+		code={
+			\draw[latex-latex]
+			(#1,0)--(0,0)node[anchor=north,pos=0]{$x$}
+			--(0,#2)node[anchor=east,pos=1]{$y$};
+		}
+	},
+	pics/xy_cos/.default = {0.8cm,0.8cm},
+}
+
+% ------------------ x/z Koordinatensystem ------------------
+% (Hinweis: Original verwendet (0,-\r); \r ist hier nicht definiert – unverändert gelassen.)
+\tikzset{
+	cosys/.pic={
+		\def\mlr{1cm}
+		\draw[latex-latex]
+		(0,-\r) -- (0,0) node[pos=0,anchor=north] {$z$}
+		-- (\mlr,0) node[pos=1,anchor=west]  {$x$};
+		
+		\draw[-latex, shorten >=-2pt]
+		(-80:0.8*\mlr) arc (-80:-20:0.8*\mlr)
+		node[pos=0.5,anchor=north west]{+};
+	}
+}
+
+
+% =========================================================
+% Reaction Forces
+% =========================================================
+
+% ------------------ Reaktionsgrößen an Einspannung ------------------
+% Pic: sf_fixed
+% Parameter: #1 Pfeillänge (Skalierung), #2 Höhe (Referenz)
+\tikzset{
+	pics/sf_fixed/.style args={#1,#2}{
+		code={
+			\def\mlf{#1}
+			\def\mlh{#2}
+			
+			\draw[line width=0.5pt,-latex,red]
+			($(0,0.5*\mlh)+(-0.8*\mlf,0)$) -- +(0.8*\mlf,0)
+			node[pos=0,anchor=east,xshift=.1cm] {$A_x$};
+			
+			\draw[line width=0.5pt,-latex,red]
+			($(0,0.5*\mlh)+(-1pt,0.4*\mlf)$) -- +(0,-\mlf)
+			node[pos=0,anchor=south,yshift=-.1cm,xshift=-1mm] {$A_z$};
+			
+			\draw[line width=0.5pt,-latex,red,shorten >=-2pt]
+			($(0,0.5*\mlh)+(120:0.4*\mlf)$) arc (120:230:0.4*\mlf)
+			node[pos=1,anchor=east,yshift=-.1cm,xshift=1mm] {$M_A$};
+		}
+	},
+	pics/sf_fixed/.default = {0.7cm,0.3cm},
+}
+
+
+% =========================================================
+% Internal Forces
+% =========================================================
+
+% ------------------ Schnittgrößen positiv ------------------
+% Pic: sl_pos
+% Parameter: #1 Pfeillänge, #2 Höhe (Referenz)
+\tikzset{
+	pics/sl_pos/.style args={#1,#2}{
+		code={
+			\def\mlf{#1}
+			\def\mlh{#2}
+			
+			\draw[line width=0.5pt,-latex,red] (0,0.5*\mlh) -- +(0.8*\mlf,0)
+			node[pos=1,anchor=west,xshift=-.1cm] {$N$};
+			
+			\draw[line width=0.5pt,-latex,red]
+			($(0,0.5*\mlh) + (1pt,0.4*\mlf)$) -- +(0,-\mlf)
+			node[pos=0,anchor=south,yshift=-.1cm,xshift=.1cm] {$Q$};
+			
+			\draw[line width=0.5pt,-latex,red,shorten >=-2pt]
+			($(0,0.5*\mlh) + (-60:0.4*\mlf)$) arc(-60:50:0.4*\mlf)
+			node[pos=1,anchor=west,yshift=.1cm,xshift=.05cm] {$M$};
+		}
+	},
+	pics/sl_pos/.default = {0.7cm,0.3cm},
+}
+
+% ------------------ Schnittgrößen negativ ------------------
+% Pic: sl_neg
+% Parameter: #1 Pfeillänge, #2 Höhe (Referenz)
+\tikzset{
+	pics/sl_neg/.style args={#1,#2}{
+		code={
+			\def\mlf{#1}
+			\def\mlh{#2}
+			
+			\draw[line width=0.5pt,-latex,red] (0,0.5*\mlh) -- +(-0.8*\mlf,0)
+			node[pos=1,anchor=east,xshift=.1cm] {$N$};
+			
+			\draw[line width=0.5pt,-latex,red]
+			($(0,0.5*\mlh)+(-1pt,-0.4*\mlf)$) -- +(0,\mlf)
+			node[pos=1,anchor=south,yshift=-.1cm,xshift=-.1cm] {$Q$};
+			
+			\draw[line width=0.5pt,-latex,red,shorten >=-2pt]
+			($(0,0.5*\mlh)+(240:0.4*\mlf)$) arc (240:130:0.4*\mlf)
+			node[pos=1,anchor=east,yshift=.1cm,xshift=-.05cm] {$M$};
+		}
+	},
+	pics/sl_neg/.default = {0.7cm,0.3cm},
+}
