@@ -1,0 +1,29 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+% Deine externe Datei einbinden
+\input{..//..//mechlib.tex}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		\coordinate (Start) at (0,0);
+		\coordinate (Ende) at (5,0);
+		
+		% Balken		
+		\pic{beam={Start,Ende,0.3cm}};
+		
+		% Lager
+		\pic[rotate=180] at (Start) {pined={1cm,1cm,45}};
+		\pic[rotate=180] at (Ende) {roller={1cm,1cm,45}};
+		
+		% 3. Last 
+		\pic{dl_uniform={Start,Ende,0.3cm,0.8cm}};
+		
+		\pic{hdim={Start,Ende,{$l$},-0.5cm}};
+	\end{tikzpicture}
+	
+\end{document}
