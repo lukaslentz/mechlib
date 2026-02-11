@@ -1,0 +1,37 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+
+% Deine externe Datei einbinden
+\input{..//..//mechlib.tex}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		% 0. Koordinaten
+		\coordinate (A) at (0,0);
+		\coordinate (B) at (0,-5);
+		\coordinate (C) at (2,-5);
+		
+		% 1. Balken
+		\pic (b1) {beam={A,B,0.4cm}};
+		\pic (b2) {beam={b1-end-right,C,0.4cm}};
+		
+		% 2. Dimensionen
+		\pic{idim={A,B,{$l_1$},-0.4cm}};
+		\pic{idim={B,C,{$l_2$},-0.4cm}};
+		
+		% 3. Lager
+		\pic[rotate=180] at (A) {fixed={1cm,0.2cm,45}};
+
+		% 4. Lasten
+		\pic{f={C,0,1cm,225,{$F_1$}}}; % Kraft
+		\pic at (C) {adim={0,45,$\alpha$,0.5cm}}; % Winkel
+		\draw[dashed] (C) -- ++(1,0); % Horizontalelinie
+	\end{tikzpicture}
+	
+\end{document}

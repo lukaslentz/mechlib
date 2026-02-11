@@ -1,6 +1,13 @@
 % =========================================================
 % TikZ / Mathe / Farben – Stylesammlung
-% (Formatierung aufgeräumt, kommentiert; Inhalt unverändert)
+% (06.02.2026/Lentz: Formatierung aufgeräumt, kommentiert; Inhalt unverändert)
+% (11.02.2026/Reinsch:
+%		- Balkendefinition angepasst, sodass vertikale Balken, schräge Balken und kombinierte Balken möglich sind
+%		- Neue Funktion idim, intelligente Bemaßung. Unterstützt horizontal, vertikal und schräge Bemaßungen
+%		- Funktion f überarbeitet, mehr Parameter und Anpassbarkeit
+%		- Funktion dl_uniform und dl_linear angepasst, sodass Name vergeben werden kann und Farben konsistent gemacht
+%		- Neue Funktionen für Fachwerke (\makeJoints und draw rod)
+% )
 % =========================================================
 
 % --- Mathe / Einheiten / Farben ---
@@ -32,10 +39,13 @@
 	every picture/.style={font=\fontsize{10}{10}\selectfont}
 }
 
+% --- Layer für Fachwerke ---
+\pgfdeclarelayer{background}
+\pgfsetlayers{background,main}
+
 % --- Standard-Schrift: serifenlos (Text im Dokument) ---
 \renewcommand{\familydefault}{\sfdefault}
 
-\def\hatchangle{45}
 
 % =========================================================
 % Mechanical Elements
@@ -69,18 +79,6 @@
 	},
 }
 
-% ------------------ Box ------------------
-% Pic: box
-% Parameter: #1 Breite, #2 Höhe
-\tikzset{
-	pics/box/.style args={#1,#2}{%
-		code={
-			\draw[body] (-0.5*#1,-0.5*#2) rectangle (0.5*#1,0.5*#2);
-		}
-	},
-	pics/box/.default={2cm,1cm},
-}
-
 % ------------------ Ball ------------------
 % Pic: ball
 % Parameter: #1 Radius, #2 Farbe
@@ -95,17 +93,34 @@
 
 % ------------------ Beam ------------------
 % Pic: beam
-% Parameter: #1 Punkt A, #2 Punkt B, #3 Höhe (Offset in y)
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Höhe (Offset)
 \tikzset{
-	pics/beam/.style args={#1,#2,#3}{%
+	pics/beam/.style args={#1,#2,#3}{
 		code={
-			\path let \p1=(#1), \p2=(#2) in
-			coordinate (-A) at (\x1, \y1)
-			coordinate (-B) at (\x2, \y2 + #3);
-			\draw[body] (-A) rectangle (-B);
+			% 1. Geometrie berechnen
+			\path let
+			\p1 = (#1),
+			\p2 = (#2),
+			\n1 = {veclen(\x2-\x1,\y2-\y1)},
+			\n2 = {(\y2-\y1)/\n1 * #3/2},
+			\n3 = {-(\x2-\x1)/\n1 * #3/2}
+			in
+			% 2. Rechteck-Ecken
+			coordinate (-A) at (\x1+\n2,\y1+\n3)
+			coordinate (-B) at (\x2+\n2,\y2+\n3)
+			coordinate (-C) at (\x2-\n2,\y2-\n3)
+			coordinate (-D) at (\x1-\n2,\y1-\n3)
+			
+			% 3. Koppel-Anker
+			coordinate (-start-left)  at (-D)
+			coordinate (-start-right) at (-A)
+			coordinate (-end-left)    at (-C)
+			coordinate (-end-right)   at (-B);
+			
+			% 4. Balken zeichnen
+			\draw[body] (-A) -- (-B) -- (-C) -- (-D) -- cycle;
 		}
-	},
-	pics/beam/.default={(0,0),(1,0),0.3},
+	}
 }
 
 
@@ -115,9 +130,9 @@
 
 % ------------------ Roller (Loslager) ------------------
 % Pic: roller
-% Parameter: #1 Breite, #2 Höhe
+% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
 \tikzset{
-	pics/roller/.style args={#1,#2}{
+	pics/roller/.style args={#1,#2,#3}{
 		code={
 			\def\mlw{0.2cm} \def\mlh{0.2cm} \def\mlr{0.06cm}
 			% Lagerdreieck
@@ -126,53 +141,53 @@
 			
 			% Schraffierte Bodenplatte
 			\fill[
-			pattern={Lines[angle=\hatchangle, distance={1pt}]},
+			pattern={Lines[angle=#3, distance={1pt}]},
 			pattern color=black
 			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
 			
 			\draw (-0.5*\mlw, \mlh) -- (0.5*\mlw, \mlh);
 		}
 	},
-	pics/roller/.default = {0.3cm,0.2cm},
+	pics/roller/.default = {0.3cm,0.2cm,45},
 }
 
 % ------------------ Pined (Gelenklager) ------------------
 % Pic: pined
-% Parameter: #1 Dimension, #2 Radius
+% Parameter: #1, #2 (aktuell nicht genutzt), #3 Schraffurwinkel
 \tikzset{
-	pics/pined/.style args={#1,#2}{
+	pics/pined/.style args={#1,#2,#3}{
 		code={
-			\def\mlw{#1}
-			\def\mlh{#1}
-			\def\mlr{#2}
+			\def\mlw{0.2cm}
+			\def\mlh{0.2cm}
+			\def\mlr{0.06cm}
 			\draw[support] (0,0) -- (-0.5*\mlw, \mlh) --+ (\mlw,0) -- cycle;
 			\draw[support] (0,0) circle (\mlr);
 			
 			\fill[
-			pattern={Lines[angle=\hatchangle, distance={1pt}]},
+			pattern={Lines[angle=#3, distance={1pt}]},
 			pattern color=black
 			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
 		}
 	},
-	pics/pined/.default = {.2cm,.4mm},
+	pics/pined/.default = {1cm,1cm,45},
 }
 
 % ------------------ Fixed Support (Einspannung) ------------------
 % Pic: fixed
-% Parameter: #1 Dimension, #2 Radius
+% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
 \tikzset{
-	pics/fixed/.style args={#1,#2}{
+	pics/fixed/.style args={#1,#2,#3}{
 		code={
 			\def\mlw{#1}
-			\def\mlh{#1}
+			\def\mlh{#2}
 			\draw[] (-0.5*\mlw,0) -- (0.5*\mlw,0);
 			\fill[
-			pattern={Lines[angle=45, distance={3pt/sqrt(2)}]},
+			pattern={Lines[angle=#3, distance={3pt/sqrt(2)}]},
 			pattern color=black
 			] (-0.5*\mlw,0) rectangle (0.5*\mlw,-\mlh);
 		}
 	},
-	pics/fixed/.default = {.2cm,.4mm},
+	pics/fixed/.default = {1cm,0.1cm,45},
 }
 
 
@@ -182,24 +197,51 @@
 
 % ------------------ Point Force ------------------
 % Pic: f
-% Parameter: #1 Bezugspunkt, #2 (aktuell nicht genutzt)
-% (Hinweis: Der Draw-Befehl ist hier wie im Original unvollständig.)
+% Parameter: #1 = Startpunkt, #2 = Richtung (0 = Spitze am Punkt, 1 = Spitze vom Punkt weg),
+%            #3 = Länge des Pfeils, #4 = Winkel in Grad (0 = rechts), #5 = Beschriftung
 \tikzset{
-	pics/f/.style args={#1,#2}{
-		code={
-			\path let \p1=(#1) in
-			coordinate (F) at (\x1, \y1);
-			\draw[-latex,red]
+	pics/f/.style args={#1,#2,#3,#4,#5}{%
+		code={%
+			% Parameter
+			\coordinate (-start) at (#1);
+			\pgfmathsetmacro{\reverse}{#2}   % 0 oder 1
+			\pgfmathsetlengthmacro{\len}{#3}
+			\pgfmathsetmacro{\angle}{#4}
+			
+			% Pfeil je nach Richtung
+			\ifnum\reverse=0
+			% Spitze am Punkt (wie bisher)
+			\coordinate (-tip) at (-start);
+			\path (-tip) -- ++({-cos(\angle)*\len},{-sin(\angle)*\len}) coordinate (-tail);
+			\draw[-latex,red,line width=1pt] (-tail) -- (-tip);
+			
+			% Beschriftung bei Tail (etwas außerhalb)
+			\pgfmathsetmacro{\offset}{0.3*\len}
+			\coordinate (-label) at ($(-tail)!-0.3!(-tip)$);
+			\else
+			% Spitze vom Punkt weg
+			\coordinate (-tip) at ($(-start) + ({cos(\angle)*\len},{sin(\angle)*\len})$);
+			\coordinate (-tail) at (-start);
+			\draw[-latex,red,line width=1pt] (-tail) -- (-tip);
+			
+			% Beschriftung vor der Spitze (leicht außerhalb)
+			\pgfmathsetmacro{\offset}{0.3*\len}
+			\coordinate (-label) at ($(-tip)!-0.3!(-tail)$);
+			\fi
+			
+			\node[red,anchor=center] at (-label) {#5};
 		}
-	},
-	pics/f/.default = {0.7cm,0.3cm},
+	}
 }
+
+
+
 
 % ------------------ Uniformly Distributed Load ------------------
 % Pic: dl_uniform
-% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Höhe der Lastdarstellung
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Höhe der Lastdarstellung, #5 Beschriftung
 \tikzset{
-	pics/dl_uniform/.style args={#1,#2,#3,#4}{
+	pics/dl_uniform/.style args={#1,#2,#3,#4,#5}{
 		code={
 			\path let \p1=(#1), \p2=(#2) in
 			coordinate (-A) at (\x1, \y1 + #3)
@@ -214,34 +256,34 @@
 				\draw[-latex,dl] ($(-A)!\dx!(-B) + (0,#4)$) -- +(0,-#4);
 			}
 			
-			\node[anchor=south,dl] at ($(-B) + (0,#4)$) {$q_0$};
+			\node[anchor=south,dl] at ($(-B) + (0,#4)$) {#5};
 		}
 	},
-	pics/dl_uniform/.default = {(0,0),(1,0),0.3cm,0.8cm},
+	pics/dl_uniform/.default = {(0,0),(1,0),0.3cm,0.8cm,$q_0$},
 }
 
 % ------------------ Linearly Distributed Load ------------------
 % Pic: dl_linear
-% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Maximalhöhe
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Offset in y, #4 Maximalhöhe, #5 Beschriftung
 \tikzset{
-	pics/dl_linear/.style args={#1,#2,#3,#4}{
+	pics/dl_linear/.style args={#1,#2,#3,#4,#5}{
 		code={
 			\path let \p1=(#1), \p2=(#2) in
 			coordinate (-A) at (\x1, \y1 + #3)
 			coordinate (-B) at (\x2, \y2 + #3);
 			
-			\fill[opacity=0.2] (-A) -- ($(-B) + (0,#4)$) -- (-B) -- cycle;
+			\fill[dl_fill] (-A) -- ($(-B) + (0,#4)$) -- (-B) -- cycle;
 			
-			\draw (-A) -- ($(-B) + (0,#4)$) -- ($(-B) + (0,.5*#4)$);
+			\draw[dl] (-A) -- ($(-B) + (0,#4)$) -- ($(-B) + (0,.5*#4)$);
 			
 			\foreach \dx in {0.2,0.4,...,1}{
-				\draw[-latex] ($(-A)!\dx!(-B) + (0,\dx*#4)$) -- +(0,-\dx*#4);
+				\draw[-latex,dl] ($(-A)!\dx!(-B) + (0,\dx*#4)$) -- +(0,-\dx*#4);
 			}
 			
-			\node[anchor=south] at ($(-B) + (0,#4)$) {$q_0$};
+			\node[anchor=south,dl] at ($(-B) + (0,#4)$) {#5};
 		}
 	},
-	pics/dl_linear/.default = {(0,0),(1,0),0.3cm,0.8cm},
+	pics/dl_linear/.default = {(0,0),(1,0),0.3cm,0.8cm,$q_0$},
 }
 
 
@@ -280,21 +322,40 @@
 	pics/hdim/.default={(0,0),(1,0),{$l$},0.3cm},
 }
 
-% ------------------ Vertical Dimension ------------------
-% Pic: vdim
-% Parameter: #1 Punkt A, #2 Punkt B, #3 Text, #4 Offset in x
+% ------------------ Intelligent Dimension ------------------
+% Pic: idim
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Text, #4 Offset in x/y
 \tikzset{
-	pics/vdim/.style args={#1,#2,#3,#4}{%
+	pics/idim/.style args={#1,#2,#3,#4}{%
 		code={
-			\path let \p1=(#1), \p2=(#2) in
-			coordinate (-A) at (\x1 + #4, \y1)
-			coordinate (-B) at (\x2 + #4, \y2);
+			% Punkte
+			\path (#1); \pgfgetlastxy{\xA}{\yA};
+			\path (#2); \pgfgetlastxy{\xB}{\yB};
 			
-			\draw[latex-latex, line width=0.5pt] (-A) -- (-B)
-			node[pos=0.5, left]{#3};
+			% Differenzen
+			\pgfmathsetmacro{\dx}{\xB-\xA}
+			\pgfmathsetmacro{\dy}{\yB-\yA}
+			
+			% Horizontal oder vertikal erkennen
+			\pgfmathsetmacro{\ishorizontal}{ifthenelse(abs(\dx) >= abs(\dy), 1, 0)}
+			
+			% Offset
+			\pgfmathsetmacro{\ox}{\ishorizontal==1 ? 0 : #4}
+			\pgfmathsetmacro{\oy}{\ishorizontal==1 ? #4 : 0}
+			
+			% Anchor für Beschriftung bestimmen
+			\pgfmathsetmacro{\anchorcode}{%
+				\ishorizontal==1 ? (#4>=0 ? "south" : "north") : (#4>=0 ? "west" : "east")%
+			}
+			\edef\myanchor{\anchorcode}
+			
+			% Zeichnen
+			\draw[latex-latex,line width=0.5pt]
+			(\xA+\ox,\yA+\oy) -- (\xB+\ox,\yB+\oy)
+			node[midway, anchor=\myanchor]{#3};
 		}
 	},
-	pics/vdim/.default={(0,0),(0,1),{$h$},0.3cm},
+	pics/idim/.default={(0,0),(1,0),{$l$},0.3cm}
 }
 
 
@@ -302,24 +363,6 @@
 % =========================================================
 % Coordinate Systems
 % =========================================================
-
-% ------------------ 1-Koordinatensystem ------------------
-% Pic: x_cos
-% Parameter: #1 Länge, #2 Name, #3 Color
-\tikzset{
-	pics/x_cos/.style args={#1,#2,#3}{
-		code={
-			\draw[latex-,#3](0,0)--(#1,0);
-			\coordinate (-tag) at ($(0,0)!.2!(#1,0)$);
-			\draw[#3](#1,-0.5*#2) -- (#1,0.5*#2);
-			\fill[
-			pattern={Lines[angle=\hatchangle, distance={1pt}]},
-			pattern color=#3
-			] (#1,-0.5*#2) rectangle (#1+0.2*#2,0.5*#2);
-		}
-	},
-	pics/x_cos/.default = {0.8cm,0.4cm,ucbblue},
-}
 
 % ------------------ x/y Koordinatensystem ------------------
 % Pic: xy_cos
@@ -432,3 +475,39 @@
 	},
 	pics/sl_neg/.default = {0.7cm,0.3cm},
 }
+
+% =========================================================
+% Trusses (Fachwerke)
+% =========================================================
+
+% ------------------ Knotendarstellung für Korrdinatenliste machen ------------------
+% Usage: \makeJoints{K1, K2, K.., Kn}
+\newcommand{\makeJoints}[1]{%
+	\foreach \k in {#1}{%
+		\draw[fill=gray!30, draw=black, line width=0.2mm] (\k) circle (0.6mm);
+	}%
+}
+
+% ------------------ Balken anlegen ------------------
+% Pic: rod
+% Parameter: #1 Knoten 1, #2 Knoten 2, #3 Balkenname, #4 Anker, #5 xshift
+\tikzset{
+	pics/rod/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\begin{pgfonlayer}{background}
+				\draw[draw=gray!80, line width=2.5pt] (#1) -- (#2);
+			\end{pgfonlayer}
+			
+			% Mittelpunkt
+			\path (#1) -- (#2) coordinate[pos=0.5] (midpoint);
+			
+			
+			% Node mit xshift
+			\node[color=black, anchor=#4, shift={(#4:#5)}] at (midpoint) {#3};
+		}
+	}
+}
+
+
+
+
