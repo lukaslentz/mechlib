@@ -1,0 +1,52 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\input{..//..//mechlib.tex}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		% Knoten anlegen
+		\coordinate (K1) at (0,0);
+		\coordinate (K2) at (0,2);
+		\coordinate (K3) at (2,2);
+		\coordinate (K4) at (4,2);
+		\coordinate (K5) at (6,2);
+		\coordinate (K6) at (4,4);
+		\coordinate (K7) at (2,4);
+		\makeJoints{K1,K2,K3,K4,K5,K6,K7}
+		
+		% Stäbe anlegen
+		\pic{rod={K1,K2, 1, east,0}};
+		\pic{rod={K1,K3, 2, north west, 1mm}};	
+		\pic{rod={K2,K3, 3, south,0}};
+		\pic{rod={K2,K7, 4, south east,1mm}};
+		\pic{rod={K7,K3, 5, east,0}};
+		\pic{rod={K3,K4, 6, south, 0}};
+		\pic{rod={K3,K6, 7, south east, 1mm}};
+		\pic{rod={K6,K7, 8, south,0}};
+		\pic{rod={K6,K4, 9, east,0}};
+		\pic{rod={K4,K5, 10, north,0}};
+		\pic{rod={K5,K6, 11, south west, 1mm}};
+		
+		% Lager
+		\pic[rotate=180] at (K1) {pined={1cm,1cm,45}};
+		\pic[rotate=90] at (K2) {roller={1cm,1cm,45}};
+		
+		% 3. Last 
+		\pic{f={K6,1,0.8cm,0,$F$}};
+		\pic{f={K5,1,0.8cm,270,$F$}};
+		
+		% 4. Dimensionen
+		\pic{idim={K2,K3,{$l$},-2.5cm}};
+		\pic{idim={K3,K4,{$l$},-2.5cm}};	
+		\pic{idim={K4,K5,{$l$},-2.5cm}};		
+		\coordinate (KL) at (0,4);
+		\pic{idim={K1,K2,{$l$},-0.8cm}};
+		\pic{idim={K2,KL,{$l$},-0.8cm}};
+	\end{tikzpicture}
+	
+\end{document}

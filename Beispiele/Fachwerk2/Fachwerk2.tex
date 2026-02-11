@@ -1,0 +1,44 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\input{..//..//mechlib.tex}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		\coordinate (K1) at (0,0);
+		\coordinate (K2) at (2,0);
+		\coordinate (K3) at (4,0);
+		\coordinate (K4) at (2,1);
+		\coordinate (K5) at (0,2);
+		\makeJoints{K1,K2,K3,K4,K5}
+			
+		% Stäbe anlegen
+		\pic{rod={K1,K2, 1, north,0}};
+		\pic{rod={K2,K3, 2, north,0}};	
+		\pic{rod={K3,K4, 3, south west, 1mm}};
+		\pic{rod={K4,K5, 4, south west, 1mm}};
+		\pic{rod={K2,K4, 5, east,0}};
+		\pic{rod={K1,K4, 6, south east, 1mm}};
+		\pic{rod={K1,K5, 7, east,0}};
+		
+		% Lager
+		\pic[rotate=180] at (K1) {pined={1cm,1cm,45}};
+		\pic[rotate=90] at (K5) {roller={1cm,1cm,45}};
+		
+		% 3. Last 
+		\pic{f={K3,1,0.8cm,270,$F$}}; % Kraft
+		\pic at (K3) {adim={180,155,$\alpha$,1cm}}; % Winkel
+		
+		% 4. Dimensionen
+		\pic{idim={K1,K2,{$l_1$},-1.5cm}};
+		\pic{idim={K2,K3,{$l_1$},-1.5cm}};		
+		\coordinate (KL) at (0,1);
+		\pic{idim={K1,KL,{$l_2$},-0.8cm}};
+		\pic{idim={KL,K5,{$l_2$},-0.8cm}};
+	\end{tikzpicture}
+	
+\end{document}

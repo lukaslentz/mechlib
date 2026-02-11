@@ -1,0 +1,63 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+
+% Deine externe Datei einbinden
+\input{..//..//mechlib.tex}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		% 0. Koordinaten
+		\coordinate (A) at (0,0);
+		\coordinate (B) at (4,0);
+		\coordinate (C) at (6,0);
+		\coordinate (A1) at (1.5,-2);
+		\coordinate (A2) at (2.5,-2);
+		\coordinate (A3) at (4.75,-2);
+		\coordinate (A4) at (5.25,-2);
+		
+		% 1. Balken
+		\pic (b1) {beam={A,B,1cm}};
+		\pic (b2) {beam={B,C,0.5cm}};
+		
+		% 2. Dimensionen
+		\pic{idim={A,B,{$l_1$},-0.7cm}};
+		\pic{idim={B,C,{$l_2$},-0.7cm}};
+		
+		% 3. Lager
+		\pic[rotate=270] at (A) {fixed={1.5cm,0.2cm,45}};
+
+		% 4. Lasten
+		\pic{f={C,1,1cm,0,$F$}}; % Last 1
+		
+		% Querschnitte
+		\pic (q1) {beam={A1,A2,1cm}};
+		\pic (q2) {beam={A3,A4,0.5cm}};
+		\pic{idim={q1-start-right,q1-end-right,{$a$},-0.2cm}};
+		\pic{idim={q1-start-right,q1-start-left,{$a$},-0.2cm}};
+		\pic{idim={q2-start-right,q2-end-right,{$b$},-0.2cm}};
+		\pic{idim={q2-start-right,q2-start-left,{$b$},-0.2cm}};
+		
+		% Radien
+		\filldraw[fill=gray!70, draw=black]
+		(b1-end-left) 
+		arc[start angle=180,end angle=270,radius=0.25cm]
+		-- ($(b2-start-left)+(0.25,0)$) -- (b2-start-left) -- cycle;
+		
+		\filldraw[fill=gray!70, draw=black]
+		(b1-end-right) 
+		arc[start angle=180,end angle=90,radius=0.25cm]
+		-- ($(b2-start-right)+(0.25,0)$) -- (b2-start-right) -- cycle;
+		
+		\draw[-latex] 
+		($(b1-end-left)+(0.5,0.5)$) -- ($(b1-end-left)+(0.05,-0.15)$) 
+		node[above right, xshift=10pt, yshift=16pt] {$r$};
+		
+	\end{tikzpicture}
+	
+\end{document}
