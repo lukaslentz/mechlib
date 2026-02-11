@@ -35,6 +35,7 @@
 % --- Standard-Schrift: serifenlos (Text im Dokument) ---
 \renewcommand{\familydefault}{\sfdefault}
 
+\def\hatchangle{45}
 
 % =========================================================
 % Mechanical Elements
@@ -66,6 +67,18 @@
 		opacity=0.2,
 		red!50
 	},
+}
+
+% ------------------ Box ------------------
+% Pic: box
+% Parameter: #1 Breite, #2 Höhe
+\tikzset{
+	pics/box/.style args={#1,#2}{%
+		code={
+			\draw[body] (-0.5*#1,-0.5*#2) rectangle (0.5*#1,0.5*#2);
+		}
+	},
+	pics/box/.default={2cm,1cm},
 }
 
 % ------------------ Ball ------------------
@@ -102,9 +115,9 @@
 
 % ------------------ Roller (Loslager) ------------------
 % Pic: roller
-% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
+% Parameter: #1 Breite, #2 Höhe
 \tikzset{
-	pics/roller/.style args={#1,#2,#3}{
+	pics/roller/.style args={#1,#2}{
 		code={
 			\def\mlw{0.2cm} \def\mlh{0.2cm} \def\mlr{0.06cm}
 			% Lagerdreieck
@@ -113,53 +126,53 @@
 			
 			% Schraffierte Bodenplatte
 			\fill[
-			pattern={Lines[angle=#3, distance={1pt}]},
+			pattern={Lines[angle=\hatchangle, distance={1pt}]},
 			pattern color=black
 			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
 			
 			\draw (-0.5*\mlw, \mlh) -- (0.5*\mlw, \mlh);
 		}
 	},
-	pics/roller/.default = {0.3cm,0.2cm,45},
+	pics/roller/.default = {0.3cm,0.2cm},
 }
 
 % ------------------ Pined (Gelenklager) ------------------
 % Pic: pined
-% Parameter: #1, #2 (aktuell nicht genutzt), #3 Schraffurwinkel
+% Parameter: #1 Dimension, #2 Radius
 \tikzset{
-	pics/pined/.style args={#1,#2,#3}{
+	pics/pined/.style args={#1,#2}{
 		code={
-			\def\mlw{0.2cm}
-			\def\mlh{0.2cm}
-			\def\mlr{0.06cm}
+			\def\mlw{#1}
+			\def\mlh{#1}
+			\def\mlr{#2}
 			\draw[support] (0,0) -- (-0.5*\mlw, \mlh) --+ (\mlw,0) -- cycle;
 			\draw[support] (0,0) circle (\mlr);
 			
 			\fill[
-			pattern={Lines[angle=#3, distance={1pt}]},
+			pattern={Lines[angle=\hatchangle, distance={1pt}]},
 			pattern color=black
 			] (-0.5*\mlw,\mlh) rectangle (0.5*\mlw,1.4*\mlh);
 		}
 	},
-	pics/pined/.default = {1cm,1cm,45},
+	pics/pined/.default = {.2cm,.4mm},
 }
 
 % ------------------ Fixed Support (Einspannung) ------------------
 % Pic: fixed
-% Parameter: #1 Breite, #2 Höhe, #3 Schraffurwinkel
+% Parameter: #1 Dimension, #2 Radius
 \tikzset{
-	pics/fixed/.style args={#1,#2,#3}{
+	pics/fixed/.style args={#1,#2}{
 		code={
 			\def\mlw{#1}
-			\def\mlh{#2}
+			\def\mlh{#1}
 			\draw[] (-0.5*\mlw,0) -- (0.5*\mlw,0);
 			\fill[
-			pattern={Lines[angle=#3, distance={3pt/sqrt(2)}]},
+			pattern={Lines[angle=45, distance={3pt/sqrt(2)}]},
 			pattern color=black
 			] (-0.5*\mlw,0) rectangle (0.5*\mlw,-\mlh);
 		}
 	},
-	pics/fixed/.default = {1cm,0.1cm,45},
+	pics/fixed/.default = {.2cm,.4mm},
 }
 
 
@@ -267,10 +280,46 @@
 	pics/hdim/.default={(0,0),(1,0),{$l$},0.3cm},
 }
 
+% ------------------ Vertical Dimension ------------------
+% Pic: vdim
+% Parameter: #1 Punkt A, #2 Punkt B, #3 Text, #4 Offset in x
+\tikzset{
+	pics/vdim/.style args={#1,#2,#3,#4}{%
+		code={
+			\path let \p1=(#1), \p2=(#2) in
+			coordinate (-A) at (\x1 + #4, \y1)
+			coordinate (-B) at (\x2 + #4, \y2);
+			
+			\draw[latex-latex, line width=0.5pt] (-A) -- (-B)
+			node[pos=0.5, left]{#3};
+		}
+	},
+	pics/vdim/.default={(0,0),(0,1),{$h$},0.3cm},
+}
+
+
 
 % =========================================================
 % Coordinate Systems
 % =========================================================
+
+% ------------------ 1-Koordinatensystem ------------------
+% Pic: x_cos
+% Parameter: #1 Länge, #2 Name, #3 Color
+\tikzset{
+	pics/x_cos/.style args={#1,#2,#3}{
+		code={
+			\draw[latex-,#3](0,0)--(#1,0);
+			\coordinate (-tag) at ($(0,0)!.2!(#1,0)$);
+			\draw[#3](#1,-0.5*#2) -- (#1,0.5*#2);
+			\fill[
+			pattern={Lines[angle=\hatchangle, distance={1pt}]},
+			pattern color=#3
+			] (#1,-0.5*#2) rectangle (#1+0.2*#2,0.5*#2);
+		}
+	},
+	pics/x_cos/.default = {0.8cm,0.4cm,ucbblue},
+}
 
 % ------------------ x/y Koordinatensystem ------------------
 % Pic: xy_cos
