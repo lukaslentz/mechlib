@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.24.0 (MiKTeX 25.12) (format=lualatex 2026.1.5)  28 MAR 2026 11:18
+This is LuaHBTeX, Version 1.24.0 (MiKTeX 25.12) (format=lualatex 2026.1.5)  28 MAR 2026 13:25
  restricted system commands enabled.
 **N_Massen_Schwinger.tex
 (./N_Massen_Schwinger.tex
@@ -656,22 +656,22 @@ L3 programming layer <2025-12-24>
 )
 
 Here is how much of LuaTeX's memory you used:
- 20424 strings out of 476081
+ 20458 strings out of 476081
  100000,953878 words of node,token memory allocated
- 7439 words of node memory still in use:
-   100 hlist, 2 vlist, 2 rule, 36 math, 252 glue, 4 kern, 19 glyph, 678 attribut
-e, 52 glue_spec, 678 attribute_list, 2 write, 414 pdf_literal, 12 pdf_colorstack
+ 8448 words of node memory still in use:
+   113 hlist, 2 vlist, 2 rule, 20 math, 366 glue, 4 kern, 25 glyph, 742 attribut
+e, 52 glue_spec, 742 attribute_list, 2 write, 378 pdf_literal, 16 pdf_colorstack
  nodes
-   avail lists: 1:1,2:36,3:833,4:34,5:22,6:2,7:634,8:2,9:212
- 42310 multiletter control sequences out of 65536+600000
+   avail lists: 1:1,2:36,3:761,4:42,5:22,6:2,7:842,8:4,9:238
+ 42344 multiletter control sequences out of 65536+600000
  28 fonts using 1600695 bytes
- 102i,11n,101p,398b,1362s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,11n,101p,398b,1349s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program F
 iles/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Program Files/MiKTeX/fo
 nts/type1/public/amsfonts/cm/cmr7.pfb>
-Output written on N_Massen_Schwinger.pdf (1 page, 26540 bytes).
+Output written on N_Massen_Schwinger.pdf (1 page, 27025 bytes).
 
-PDF statistics: 22 PDF objects out of 1000 (max. 8388607)
+PDF statistics: 23 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 1048576)
- 21 words of extra memory for PDF output out of 10000 (max. 100000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 100000000)
 

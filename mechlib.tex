@@ -62,6 +62,7 @@
 	},
 }
 
+
 % Lager / Auflager
 \tikzset{
 	support/.style={
@@ -585,38 +586,100 @@
 	}
 }
 
+% ------------------ Bewegtes Pendel ------------------
+% Pic: bewegtespendel
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung, #6 Länge, #7 Winkel, #8 Radius der Masse
+\tikzset{
+	pics/bewegtespendel/.style args={#1,#2,#3,#4,#5,#6,#7,#8}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			\pgfmathsetlengthmacro{\ml}{#6 cm}
+			\pgfmathsetmacro{\malph}{#7}
+			\pgfmathsetlengthmacro{\mpr}{#8 cm}
+			
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			
+			\fill[black] (1.5*\mb,2*\mr+.5*\mh) circle (1pt);
+			\draw[] (1.5*\mb,2*\mr+.5*\mh) --+ (\malph:\ml);
+			\draw[body] ($ (1.5*\mb,2*\mr+.5*\mh) + (\malph:\ml)$) circle (\mpr);
+			
+			% Wand
+			\draw[gray](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			
+		}
+	}
+}
 
 % ------------------ Wagen ------------------
 % Pic: Wagen
-% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+% Parameter: #1 Höhe, #2 Breite, #3 Radius Räder, #4 Name der Masse
 \tikzset{
-	pics/wagen/.style args={#1,#2,#3,#4,#5}{
+	pics/wagen/.style args={#1,#2,#3,#4}{
 		code={
 			
-			\pgfmathsetlengthmacro{\mh}{0.8*#1 cm}
-			\pgfmathsetlengthmacro{\mr}{0.1*#1 cm}
-			\pgfmathsetlengthmacro{\mw}{0.5*#2 cm}
+			\pgfmathsetlengthmacro{\mh}{#1 cm}
+			\pgfmathsetlengthmacro{\mb}{#2 cm}
+			\pgfmathsetlengthmacro{\mr}{#3 cm}
 			
 			% Wagen
-			\draw[fill=gray!20,thick] (1.2*\mw,\mr) circle (\mr);
-			\draw[fill=gray!20,thick] (1.8*\mw,\mr) circle (\mr);
-			\draw[body,thick] (\mw,2*\mr) rectangle (2*\mw,2*\mr+\mh);
-			\node[]at(1.5*\mw,2*\mr+.5*\mh){#3};
-			
-			% Feder
-			\draw[thick] 
-			(0,2*\mr+0.3*\mh)--++(0.2*\mw,0)
-			decorate[decoration={zigzag, segment length=.15*\mw, amplitude=.1*\mh}]{--++(0.6*\mw,0)node[pos=0.5,anchor=north,yshift=-.1*\mh]{#4}} 
-			--++(0.2*\mw,0);
-			
-			% Dämpfer
-			\draw[thick] (0,2*\mr+0.75*\mh)--++(0.3*\mw,0);
-			\draw[thick] (0.7*\mw,2*\mr+0.65*\mh)--++(-0.4*\mw,0)--++(0,0.2*\mh)--++(0.4*\mw,0)node[pos=0.5,anchor=south]{#5};
-			\draw[thick] (\mw,2*\mr+0.75*\mh)--++(-0.4*\mw,0);
+			\draw[body] (.2*\mb,\mr) circle (\mr);
+			\draw[body] (.8*\mb,\mr) circle (\mr);
+			\draw[body] (0,2*\mr) rectangle (\mb,2*\mr+\mh);
+			\node[]at(.5*\mb,2*\mr+.5*\mh){#4};
 			
 			% Boden
-			\draw[thick](\mw,0) --++ (\mw,0);
-			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](\mw,0) rectangle (2*\mw,-3pt);
+			\draw[](0,0) --++ (\mb,0);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (\mb,-3pt);
+			
+		}
+	}
+}
+
+% ------------------ Feder ------------------			
+% Feder
+% Pic: Feder
+% Parameter: #1 Startx, #2 Endx, #3 Höhe, #4 Name
+\tikzset{
+	pics/feder/.style args={#1,#2,#3,#4}{
+		code={
+
+			\pgfmathsetlengthmacro{\mxs}{#1 cm}
+			\pgfmathsetlengthmacro{\mxe}{#2 cm}
+			\pgfmathsetlengthmacro{\my}{#3 cm}
+			\pgfmathsetlengthmacro{\ml}{\mxe-\mxs}
+			
+			\draw[] 
+			(\mxs,\my)--++(0.2*\ml,0)
+			decorate[decoration={zigzag, segment length=.15*\ml, amplitude=.1*\ml}]{--++(0.6*\ml,0)node[pos=0.5,anchor=north,yshift=-.1*\ml]{#4}} 
+			--++(0.2*\ml,0);
+			
+		}
+	}
+}
+
+% ------------------ Dämpfer ------------------			
+% Dämpfer
+% Pic: Dämpfer
+% Parameter: #1 Startx, #2 Endx, #3 Höhe, #4 Name
+\tikzset{
+	pics/daempfer/.style args={#1,#2,#3,#4}{
+		code={
+			
+			\pgfmathsetlengthmacro{\mxs}{#1 cm}
+			\pgfmathsetlengthmacro{\mxe}{#2 cm}
+			\pgfmathsetlengthmacro{\my}{#3 cm}
+			\pgfmathsetlengthmacro{\ml}{\mxe-\mxs}
+			
+			\draw[] (\mxs,\my)--++(0.3*\ml,0);
+			\draw[] (0.7*\ml,\my-.1*\ml)--++(-.4*\ml,0)--++(0,.2*\ml)--++(0.4*\ml,0)node[pos=0.5,anchor=south]{#4};
+			\draw[] (\ml,\my)--++(-0.4*\ml,0);
 			
 		}
 	}
@@ -628,15 +691,18 @@
 \tikzset{
 	pics/einmassenschwinger/.style args={#1,#2,#3,#4,#5}{
 		code={
-			
-			\pgfmathsetlengthmacro{\mh}{0.8*#1 cm}
-			\pgfmathsetlengthmacro{\mr}{0.1*#1 cm}
-			\pgfmathsetlengthmacro{\mw}{0.5*#2 cm}
-			
-			\pic{wagen={#1,#2,#3,#4,#5}};
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+	
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
 			
 			% Wand
-			\draw[thick](0,0) --++ (0,\mh+2*\mr);
+			\draw[](0,0) --++ (0,\mh+2*\mr);
 			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
 
 		}
@@ -649,21 +715,39 @@
 \tikzset{
 	pics/zweimassenschwinger/.style args={#1,#2,#3,#4,#5}{
 		code={
-			
-			\pgfmathsetlengthmacro{\mh}{0.8*#1 cm}
-			\pgfmathsetlengthmacro{\mr}{0.1*#1 cm}
-			\pgfmathsetlengthmacro{\mw}{0.5*#2 cm}
-			
-			\pic{wagen={#1,#2,#3$_1$,#4$_1$,#5$_1$}};
-			
-			\begin{scope}[xshift=2*\mw]
-				\pic{wagen={#1,#2,#3$_2$,#4$_2$,#5$_2$}};
-			\end{scope}
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
 			
 			% Wand
-			\draw[thick](0,0) --++ (0,\mh+2*\mr);
+			\draw[](0,0) --++ (0,\mh+2*\mr);
 			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
 			
+			% Schwinger
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mf,$c_2$}};
+				\pic {daempfer={0,\mb,\md,$d_2$}};
+			\end{scope}
+			
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mf,$c_3$}};
+				\pic {daempfer={0,\mb,\md,$d_3$}};
+			\end{scope}
+			
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		
 		}
 	}
 }
@@ -674,25 +758,43 @@
 \tikzset{
 	pics/nmassenschwinger/.style args={#1,#2,#3,#4,#5}{
 		code={
-			
-			\pgfmathsetlengthmacro{\mh}{0.8*#1 cm}
-			\pgfmathsetlengthmacro{\mr}{0.1*#1 cm}
-			\pgfmathsetlengthmacro{\mw}{0.5*#2 cm}
-			
-			\pic{wagen={#1,#2,#3$_1$,#4$_1$,#5$_1$}};
-			
-			\begin{scope}[xshift=2*\mw]
-				\pic{wagen={#1,#2,#3$_2$,#4$_2$,#5$_2$}};
-				\fill[white] (.9*\mw,-5pt) rectangle (2.1*\mw,2*\mr+1.1*\mh);
-			\end{scope}
-			
-			\begin{scope}[xshift=5*\mw]
-				\pic{wagen={#1,#2,#3$_n$,#4$_n$,#5$_n$}};
-			\end{scope}
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
 			
 			% Wand
-			\draw[thick](0,0) --++ (0,\mh+2*\mr);
+			\draw[](0,0) --++ (0,\mh+2*\mr);
 			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			
+			% Schwinger
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic {feder={0,\mb,\mf,$c_2$}};
+				\pic {daempfer={0,\mb,\md,$d_2$}};
+			\end{scope}
+			
+			\begin{scope}[xshift=5*\mb cm]
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_n$}};
+				\pic {feder={0,\mb,\mf,$c_{n}$}};
+				\pic {daempfer={0,\mb,\md,$d_{n}$}};
+			\end{scope}
+			
+			\begin{scope}[xshift=7*\mb cm]
+				\pic {feder={0,\mb,\mf,$c_{n+1}$}};
+				\pic {daempfer={0,\mb,\md,$d_{n+1}$}};
+			\end{scope}
+			
+			\begin{scope}[xshift=8*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
 			
 		}
 	}
