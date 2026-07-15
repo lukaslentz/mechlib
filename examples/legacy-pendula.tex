@@ -1,0 +1,54 @@
+% =========================================================
+% Legacy-Archiv: legacy-pendula.tex
+% =========================================================
+% Historische Pendel-Pics aus mechlib v1. Die Datei wird nicht automatisch von
+% mechlib.tex geladen. Sie bleibt als Migrationsreferenz erhalten und verwendet
+% weiterhin alte Pic-/Stilnamen (z. B. pined, adim, wagen, feder, daempfer).
+%
+% Neue Pendelbilder sollten aus atomaren mech/*-Elementen aufgebaut werden. Die
+% Parameterlisten der Legacy-Pics sind an den jeweiligen Abschnitten vermerkt.
+% =========================================================
+\tikzset{
+	pics/pendel/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetlengthmacro{\ml}{#1 cm}
+			\pgfmathsetmacro{\malph}{#2}
+			\pgfmathsetlengthmacro{\mr}{#3 cm}
+			\draw[gray!30](0,0)--(0,-\ml);
+			\draw[](0,0)--(\malph:\ml);
+			\draw[body] (\malph:\ml) circle (\mr);
+			\node at (\malph:\ml) {#4};
+			\pic{pined={1,1,45}};
+			\pic[ucbblue]{adim={-90,\malph,$\varphi$,0.9}};
+		}
+	}
+}
+% ------------------ Bewegtes Pendel ------------------
+% Pic: bewegtespendel
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung, #6 Länge, #7 Winkel, #8 Radius der Masse
+\tikzset{
+	pics/bewegtespendel/.style args={#1,#2,#3,#4,#5,#6,#7,#8}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			\pgfmathsetlengthmacro{\ml}{#6 cm}
+			\pgfmathsetmacro{\malph}{#7}
+			\pgfmathsetlengthmacro{\mpr}{#8 cm}
+			\draw[red,-latex,thick](2*\mb,2*\mr+.5*\mh)--+(.7,0)node[anchor=south,pos=.8]{$F(t)$};
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$\,$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			\fill[black] (1.5*\mb,2*\mr+.5*\mh) circle (1pt);
+			\draw[] (1.5*\mb,2*\mr+.5*\mh) --+ (\malph:\ml);
+			\draw[body] ($ (1.5*\mb,2*\mr+.5*\mh) + (\malph:\ml)$) circle (\mpr);
+			% Wand
+			\draw[gray](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+		}
+	}
+}

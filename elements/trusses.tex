@@ -1,0 +1,67 @@
+% =========================================================
+% mechlib/elements/trusses.tex
+% FACHWERKE: STAB UND GEMEINSAME GELENKDARSTELLUNG
+% =========================================================
+% Dieses Modul enthaelt die atomaren Fachwerkelemente. Die Topologie eines
+% Fachwerks bleibt bewusst im Anwendungsdokument: Knoten werden als TikZ-
+% Koordinaten definiert und durch mech/rod bzw. \mechJoints verbunden.
+%
+% Oeffentliche API:
+%   mech/rod     Stab zwischen "from" und "to" mit optionalem Label
+%   \mechJoints{A,B,C,...} zeichnet alle angegebenen Gelenke
+%
+% Darstellungsregeln:
+%   - Staebe verwenden standardmaessig den Stil mech/rod: schwarz und duenn.
+%   - Staebe werden auf dem Layer "mech background" gezeichnet.
+%   - Stabnummern besitzen keine Fuellung (fill=none) und bleiben transparent.
+%   - Gelenke liegen optisch vor den Staeben und sind mit mechBodyColor gefuellt.
+%
+% Beispiel:
+%   \pic {mech/rod={from=(A),to=(B),label=1,label side=above}};
+%   \mechJoints{A,B}
+% =========================================================
+% -------------------------------------------------------------------------
+% Einzelner Fachwerkstab
+% -------------------------------------------------------------------------
+% "style" erlaubt lokale Abweichungen, ohne den globalen mech/rod-Stil zu
+% veraendern. Die Standardbeschriftung liegt an der Stabmitte.
+\pgfkeys{
+  /mech/rod/.is family,
+  /mech/rod,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  label/.initial=,
+  label side/.initial=above,
+  label style/.initial={mech/label,fill=none,text=black},
+  style/.initial=mech/rod,
+}
+\tikzset{
+  pics/mech/rod/.style args={#1}{
+    code={
+      \pgfkeys{/mech/rod/.cd,#1}
+      \edef\mechRodFrom{\pgfkeysvalueof{/mech/rod/from}}
+      \edef\mechRodTo{\pgfkeysvalueof{/mech/rod/to}}
+      \coordinate (-start) at \mechRodFrom;
+      \coordinate (-end) at \mechRodTo;
+      \coordinate (-center) at ($(-start)!.5!(-end)$);
+      \begin{pgfonlayer}{mech background}
+        \draw[\pgfkeysvalueof{/mech/rod/style}] (-start)--(-end);
+      \end{pgfonlayer}
+      \node[\pgfkeysvalueof{/mech/rod/label style},\pgfkeysvalueof{/mech/rod/label side}]
+        at (-center) {\pgfkeysvalueof{/mech/rod/label}};
+    }
+  },
+  pics/mech/rod/.default={},
+}
+% -------------------------------------------------------------------------
+% Gelenkliste
+% -------------------------------------------------------------------------
+% Das Makro erwartet eine kommaseparierte Liste bereits definierter TikZ-
+% Koordinaten. Jedes Gelenk wird identisch gezeichnet. Die Gelenke sollten nach
+% den Staeben aufgerufen werden, damit sie die Stabenden optisch ueberdecken.
+\newcommand{\mechJoints}[1]{%
+  \foreach \mechJoint in {#1}{%
+    \draw[fill=mechBodyColor,draw=black,line width=.2mm]
+      (\mechJoint) circle[radius=.6mm];%
+  }%
+}

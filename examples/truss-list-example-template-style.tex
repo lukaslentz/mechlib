@@ -1,0 +1,63 @@
+% =========================================================
+% Beispiel: truss-list-example-template-style.tex
+% ZIEL: Referenzdarstellung fuer Fachwerke im aktuellen mechlib-Stil.
+%
+% Enthalten sind schwarze, duenne Staebe, transparente Stabnummern, mit
+% mechBodyColor gefuellte Gelenke sowie die kompakten Fest-/Loslager. Dieses
+% Dokument ist die visuelle Referenz fuer die Fachwerk- und Lagergeometrie.
+% =========================================================
+% "standalone" schneidet die PDF auf die Bounding Box der TikZ-Grafik zu.
+\documentclass[tikz,border=6pt]{standalone}
+% Das Beispiel liegt in mechlib/examples; der Bibliotheksstamm liegt eine Ebene
+% hoeher. Der Loader verwendet diesen Pfad fuer alle internen \input-Aufrufe.
+\newcommand{\mechlibpath}{..}
+\input{../mechlib}
+\begin{document}
+% Ab hier wird ausschliesslich die oeffentliche mechlib-/TikZ-API verwendet.
+\begin{tikzpicture}[x=1.8cm,y=1.8cm]
+  % Knotenkoordinaten: Die Topologie wird explizit durch benannte Punkte definiert.
+  \coordinate (A) at (0,0);
+  \coordinate (E) at (1,1.2);
+  \coordinate (F) at (1,0);
+  \coordinate (C) at (2.2,1.2);
+  \coordinate (B) at (2.2,0);
+  \coordinate (G) at (3.2,1.2);
+  \coordinate (H) at (3.2,0);
+  \coordinate (D) at (4.0,0.42);
+
+  % Lager zuerst platzieren; die spaeteren Gelenke ueberdecken die Stabenden.
+  \pic at (A) {mech/pinned-support={}};
+  \pic at (B) {mech/roller-support={}};
+
+  % Fachwerkstaebe und Stabnummern. Die Labels haben keine Hintergrundfuellung.
+  \draw[mech/rod] (A)--(E) node[midway,above left,fill=none] {1};
+  \draw[mech/rod] (E)--(C) node[midway,above,fill=none] {2};
+  \draw[mech/rod] (E)--(F) node[midway,right,fill=none] {3};
+  \draw[mech/rod] (A)--(F) node[midway,below,fill=none] {4};
+  \draw[mech/rod] (E)--(B) node[midway,above left,fill=none] {5};
+  \draw[mech/rod] (C)--(B) node[midway,left,fill=none] {6};
+  \draw[mech/rod] (C)--(G) node[midway,above,fill=none] {7};
+  \draw[mech/rod] (G)--(H) node[midway,left,fill=none] {8};
+  \draw[mech/rod] (C)--(H) node[midway,above right,fill=none] {9};
+  \draw[mech/rod] (F)--(B) node[midway,below,fill=none] {10};
+  \draw[mech/rod] (B)--(H) node[midway,below,fill=none] {11};
+  \draw[mech/rod] (H)--(D) node[midway,below,fill=none] {12};
+  \draw[mech/rod] (G)--(D) node[midway,above right,fill=none] {13};
+
+  % Alle Gelenke in einem einheitlichen Schritt vor den Staeben darstellen.
+  \mechJoints{A,E,F,C,B,G,H,D}
+
+  % Benennung der fuer die Aufgabenstellung relevanten Knoten.
+  \node[left=4pt] at (A) {$A$};
+  \node[right=4pt] at (B) {$B$};
+  \node[above=3pt] at (C) {$C$};
+  \node[right=4pt] at (D) {$D$};
+
+  % Aeussere Lasten im zentralen mech/load-Stil.
+  \draw[mech/load,-{Latex[length=2mm]}] ($(C)+(0,0.75)$) -- (C);
+  \node[mech/label,above=2pt,text=mechLoadColor] at ($(C)+(0,0.75)$) {$mg$};
+
+  \draw[mech/load,-{Latex[length=2mm]}] ($(D)+(0,0.62)$) -- (D);
+  \node[mech/label,above=2pt,text=mechLoadColor] at ($(D)+(0,0.62)$) {$F$};
+\end{tikzpicture}
+\end{document}

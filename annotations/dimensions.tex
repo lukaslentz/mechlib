@@ -1,0 +1,70 @@
+% =========================================================
+% mechlib/annotations/dimensions.tex
+% BEMASSUNGEN: LINEARES MASS UND WINKELMASS
+% =========================================================
+% Lineare Bemassungen werden geometrisch aus zwei Endpunkten abgeleitet. Der
+% Offset wirkt senkrecht auf die Verbindung von "from" nach "to"; damit
+% funktioniert dasselbe Pic fuer horizontale, vertikale und schraege Masse.
+%
+% Oeffentliche Pics:
+%   mech/dimension       lineare Bemassung mit Doppelpfeil
+%   mech/angle-dimension Kreisbogen zwischen zwei Winkeln
+%
+% Interne Koordinaten -A und -B sind die senkrecht versetzten Endpunkte der
+% Masslinie. Die Vektorrechnung erfolgt in TikZ "let"-Syntax.
+% =========================================================
+\pgfkeys{
+  /mech/dimension/.is family,
+  /mech/dimension,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  label/.initial={$l$},
+  offset/.initial=3mm,
+  style/.initial=mech/dimension,
+}
+\tikzset{
+  pics/mech/dimension/.style args={#1}{
+    code={
+      \pgfkeys{/mech/dimension/.cd,#1}
+      \edef\mechDimFrom{\pgfkeysvalueof{/mech/dimension/from}}
+      \edef\mechDimTo{\pgfkeysvalueof{/mech/dimension/to}}
+      \path let
+        \p1=\mechDimFrom,\p2=\mechDimTo,
+        \n1={veclen(\x2-\x1,\y2-\y1)},
+        \n2={-(\y2-\y1)/\n1*\pgfkeysvalueof{/mech/dimension/offset}},
+        \n3={(\x2-\x1)/\n1*\pgfkeysvalueof{/mech/dimension/offset}}
+      in
+        coordinate (-A) at (\x1+\n2,\y1+\n3)
+        coordinate (-B) at (\x2+\n2,\y2+\n3);
+      \draw[\pgfkeysvalueof{/mech/dimension/style}]
+        (-A)--(-B)
+        node[midway,fill=white,inner sep=1pt]
+        {\pgfkeysvalueof{/mech/dimension/label}};
+    }
+  },
+  pics/mech/dimension/.default={},
+}
+\pgfkeys{
+  /mech/angle-dimension/.is family,
+  /mech/angle-dimension,
+  start angle/.initial=0,
+  end angle/.initial=45,
+  radius/.initial=7mm,
+  label/.initial={$\alpha$},
+}
+\tikzset{
+  pics/mech/angle-dimension/.style args={#1}{
+    code={
+      \pgfkeys{/mech/angle-dimension/.cd,#1}
+      \draw
+        (\pgfkeysvalueof{/mech/angle-dimension/start angle}:\pgfkeysvalueof{/mech/angle-dimension/radius})
+        arc[start angle=\pgfkeysvalueof{/mech/angle-dimension/start angle},
+            end angle=\pgfkeysvalueof{/mech/angle-dimension/end angle},
+            radius=\pgfkeysvalueof{/mech/angle-dimension/radius}];
+      \pgfmathsetmacro{\mechAngleMid}{.5*(\pgfkeysvalueof{/mech/angle-dimension/start angle}+\pgfkeysvalueof{/mech/angle-dimension/end angle})}
+      \node at (\mechAngleMid:{.7*\pgfkeysvalueof{/mech/angle-dimension/radius}})
+        {\pgfkeysvalueof{/mech/angle-dimension/label}};
+    }
+  },
+  pics/mech/angle-dimension/.default={},
+}

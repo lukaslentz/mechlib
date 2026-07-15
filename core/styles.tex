@@ -1,0 +1,63 @@
+% =========================================================
+% mechlib/core/styles.tex
+% ZENTRALE, NAMENSRAUMGESCHUETZTE TIKZ-STILE
+% =========================================================
+% Diese Datei definiert ausschliesslich visuelle Grundstile. Die eigentliche
+% Geometrie eines Elements gehoert in elements/ bzw. annotations/.
+%
+% Alle oeffentlichen Bibliotheksstile beginnen mit "mech/". Das reduziert
+% Namenskollisionen mit dem Hauptdokument und macht im TikZ-Code sichtbar,
+% welche Formatierung aus der mechlib stammt.
+%
+% Designregel:
+%   - Farben werden aus core/colors.tex bezogen.
+%   - Geometrien werden NICHT hier definiert.
+%   - Linienstarken werden hier zentral gehalten, soweit sie elementuebergreifend
+%     konsistent sein sollen.
+% =========================================================
+% -------------------------------------------------------------------------
+% Visuelle Basisstile
+% -------------------------------------------------------------------------
+% Einzelne Pics duerfen diese Stile ueber ihre jeweiligen "style"-Keys ersetzen.
+\tikzset{
+  mech/body/.style={
+    draw=black,
+    fill=mechBodyColor,
+    line width=.6pt
+  },
+  mech/support/.style={
+    draw=black,
+    fill=mechSupportColor,
+    line width=.6pt
+  },
+  mech/connector/.style={
+    draw=black,
+    line width=.6pt
+  },
+  mech/rod/.style={
+    draw=black,
+    line width=.85pt
+  },
+  mech/load/.style={
+    draw=mechLoadColor,
+    text=mechLoadColor,
+    line width=1pt
+  },
+  mech/load fill/.style={
+    fill=mechLoadColor,
+    fill opacity=.16,
+    draw=none
+  },
+  mech/dimension/.style={
+    {Latex[length=2mm]}-{Latex[length=2mm]},
+    line width=.5pt
+  },
+  mech/axis/.style={
+    draw=mechAxisColor,
+    text=mechAxisColor,
+    line width=.6pt
+  },
+  mech/label/.style={
+    inner sep=1pt
+  }
+}

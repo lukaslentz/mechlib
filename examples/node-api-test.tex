@@ -1,0 +1,25 @@
+% =========================================================
+% Test: node-api-test.tex
+% ZIEL: pruefen, ob benannte Koerper-Pics regulaere TikZ-Node-Anker exportieren.
+%
+% Die schwarzen Punkte markieren exemplarisch .south east, .north east und
+% .west. Veraenderungen an der Alias-Logik in bodies.tex sollten mit diesem
+% Dokument sofort visuell und durch erfolgreiche Kompilation kontrolliert werden.
+% =========================================================
+% "standalone" schneidet die PDF auf die Bounding Box der TikZ-Grafik zu.
+\documentclass[tikz,border=5pt]{standalone}
+% Das Beispiel liegt in mechlib/examples; der Bibliotheksstamm liegt eine Ebene
+% hoeher. Der Loader verwendet diesen Pfad fuer alle internen \input-Aufrufe.
+\newcommand{\mechlibpath}{..}
+\input{../mechlib}
+\begin{document}
+% Ab hier wird ausschliesslich die oeffentliche mechlib-/TikZ-API verwendet.
+\begin{tikzpicture}
+  \pic (m1) at (0,0) {mech/mass={label=$m_1$}};
+  \pic (p1) at (3,0) {mech/point-mass={label=$p$}};
+  \pic (c1) at (6,0) {mech/cart={label=$m$,ground=false}};
+  \fill (m1.south east) circle[radius=1pt];
+  \fill (p1.north east) circle[radius=1pt];
+  \fill (c1.west) circle[radius=1pt];
+\end{tikzpicture}
+\end{document}

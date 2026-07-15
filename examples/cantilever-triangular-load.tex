@@ -1,0 +1,79 @@
+% =========================================================
+% Beispiel: cantilever-triangular-load.tex
+% ZIEL: Aufbau eines Kragtraegers mit dreieckiger Streckenlast und Bemassung.
+%
+% Das Beispiel demonstriert insbesondere mech/beam, mech/fixed-support,
+% mech/distributed-load sowie die geometrische Offset-Bemassung.
+% =========================================================
+% "standalone" schneidet die PDF auf die Bounding Box der TikZ-Grafik zu.
+\documentclass[tikz,border=5pt]{standalone}
+
+% Das Beispiel liegt in mechlib/examples; der Bibliotheksstamm liegt eine Ebene
+% hoeher. Der Loader verwendet diesen Pfad fuer alle internen \input-Aufrufe.
+\newcommand{\mechlibpath}{..}
+\input{../mechlib}
+
+\begin{document}
+% Ab hier wird ausschliesslich die oeffentliche mechlib-/TikZ-API verwendet.
+\begin{tikzpicture}
+
+  % ---------------------------------------------------------
+  % Geometrie
+  % ---------------------------------------------------------
+  \coordinate (A) at (0,0);
+  \coordinate (C) at (3,0);
+  \coordinate (B) at (8,0);
+
+  % Einspannung
+  \pic (wall) at (A) {mech/fixed-support={angle=90}};
+
+  % Balken
+  \pic (beam) {
+    mech/beam={
+      from=(A),
+      to=(B),
+      height=3mm
+    }
+  };
+
+  % ---------------------------------------------------------
+  % Linear abfallende Streckenlast ab x = l_1
+  % ---------------------------------------------------------
+  \pic (qload) {
+    mech/distributed-load={
+      from=(C),
+      to=(B),
+      start value=1,
+      end value=0,
+      height=1.2cm,
+      offset=1.5mm,
+      arrows=5
+    }
+  };
+
+  \node[mech/label,text=mechLoadColor,above left,yshift=10mm]
+  at (qload-start) {$q_0$};
+
+  % ---------------------------------------------------------
+  % Bemaßung
+  % ---------------------------------------------------------
+  \pic {
+    mech/dimension={
+      from=(A),
+      to=(C),
+      label=$l_1$,
+      offset=-1.0cm
+    }
+  };
+
+  \pic {
+    mech/dimension={
+      from=(C),
+      to=(B),
+      label=$l_2$,
+      offset=-1.0cm
+    }
+  };
+
+\end{tikzpicture}
+\end{document}

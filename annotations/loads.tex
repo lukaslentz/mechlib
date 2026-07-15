@@ -1,0 +1,179 @@
+% =========================================================
+% mechlib/annotations/loads.tex
+% LASTANNOTATIONEN: KRAFT, MOMENT UND STRECKENLAST
+% =========================================================
+% Diese Datei stellt die Lastsymbole der mechlib bereit. Alle Lasten verwenden
+% standardmaessig den zentralen Stil mech/load und damit mechLoadColor.
+%
+% Oeffentliche Pics:
+%   mech/force            Einzelkraft als Winkel/Laenge oder from/to
+%   mech/moment           Kreisbogensymbol im oder gegen den Uhrzeigersinn
+%   mech/distributed-load konstante, dreieckige oder linear veraenderliche Last
+%
+% Besonderheit der Streckenlast:
+% Die Grundlinie wird lokal auf die x-Achse gedreht. Dadurch kann die gesamte
+% Geometrie in einem einfachen lokalen Koordinatensystem berechnet werden. Sehr
+% kurze Pfeile, deren Laenge kleiner als ihre Pfeilspitze ist, werden bewusst
+% unterdrueckt; so entstehen am Nullende einer Dreieckslast keine Artefakte.
+% =========================================================
+\pgfkeys{
+  /mech/force/.is family,
+  /mech/force,
+  from/.initial={(0,0)},
+  to/.initial=,
+  angle/.initial=0,
+  length/.initial=1.5cm,
+  label/.initial=,
+  label position/.initial=above,
+  direction/.initial=away,
+  style/.initial=mech/load,
+}
+\tikzset{
+  pics/mech/force/.style args={#1}{
+    code={
+      \pgfkeys{/mech/force/.cd,#1}
+      \edef\mechForceFrom{\pgfkeysvalueof{/mech/force/from}}
+      \edef\mechForceTo{\pgfkeysvalueof{/mech/force/to}}
+      \edef\mechForceDirection{\pgfkeysvalueof{/mech/force/direction}}
+      \def\mechForceToward{toward}
+      \ifx\mechForceTo\empty
+        \ifx\mechForceDirection\mechForceToward
+          \draw[\pgfkeysvalueof{/mech/force/style},-{Latex[length=2.5mm]}]
+            (\pgfkeysvalueof{/mech/force/angle}:\pgfkeysvalueof{/mech/force/length}) -- (0,0)
+            node[midway,\pgfkeysvalueof{/mech/force/label position}]
+            {\pgfkeysvalueof{/mech/force/label}};
+        \else
+          \draw[\pgfkeysvalueof{/mech/force/style},-{Latex[length=2.5mm]}]
+            (0,0) -- (\pgfkeysvalueof{/mech/force/angle}:\pgfkeysvalueof{/mech/force/length})
+            node[midway,\pgfkeysvalueof{/mech/force/label position}]
+            {\pgfkeysvalueof{/mech/force/label}};
+        \fi
+      \else
+        \ifx\mechForceDirection\mechForceToward
+          \draw[\pgfkeysvalueof{/mech/force/style},-{Latex[length=2.5mm]}]
+            \mechForceTo -- \mechForceFrom
+            node[midway,\pgfkeysvalueof{/mech/force/label position}]
+            {\pgfkeysvalueof{/mech/force/label}};
+        \else
+          \draw[\pgfkeysvalueof{/mech/force/style},-{Latex[length=2.5mm]}]
+            \mechForceFrom -- \mechForceTo
+            node[midway,\pgfkeysvalueof{/mech/force/label position}]
+            {\pgfkeysvalueof{/mech/force/label}};
+        \fi
+      \fi
+    }
+  },
+  pics/mech/force/.default={},
+}
+\pgfkeys{
+  /mech/moment/.is family,
+  /mech/moment,
+  radius/.initial=6mm,
+  label/.initial=,
+  direction/.is choice,
+  direction/ccw/.code={\def\mechMomentStart{-60}\def\mechMomentEnd{220}},
+  direction/cw/.code={\def\mechMomentStart{240}\def\mechMomentEnd{-40}},
+  direction=ccw,
+  style/.initial=mech/load,
+}
+\tikzset{
+  pics/mech/moment/.style args={#1}{
+    code={
+      \pgfkeys{/mech/moment/.cd,direction=ccw,#1}
+      \draw[\pgfkeysvalueof{/mech/moment/style},-{Latex[length=2.5mm]}]
+        (\mechMomentStart:\pgfkeysvalueof{/mech/moment/radius})
+        arc[start angle=\mechMomentStart,end angle=\mechMomentEnd,
+            radius=\pgfkeysvalueof{/mech/moment/radius}];
+      \node[mech/label,above] at (0,\pgfkeysvalueof{/mech/moment/radius})
+        {\pgfkeysvalueof{/mech/moment/label}};
+    }
+  },
+  pics/mech/moment/.default={},
+}
+\pgfkeys{
+  /mech/distributed-load/.is family,
+  /mech/distributed-load,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  start value/.initial=1,
+  end value/.initial=1,
+  height/.initial=8mm,
+  offset/.initial=0mm,
+  arrows/.initial=6,
+  arrowhead length/.initial=2mm,
+  label/.initial=,
+  label position/.initial=above,
+  style/.initial=mech/load,
+}
+\tikzset{
+  pics/mech/distributed-load/.style args={#1}{
+    code={
+      \pgfkeys{/mech/distributed-load/.cd,#1}
+      \edef\mechDLFrom{\pgfkeysvalueof{/mech/distributed-load/from}}
+      \edef\mechDLTo{\pgfkeysvalueof{/mech/distributed-load/to}}
+      \path let
+        \p1=\mechDLFrom,\p2=\mechDLTo,
+        \n1={veclen(\x2-\x1,\y2-\y1)},
+        \n2={atan2(\y2-\y1,\x2-\x1)}
+      in
+        coordinate (-start) at (\x1,\y1)
+        coordinate (-end) at (\x2,\y2)
+        coordinate (-helper) at (\n2,\n1);
+      \path (-helper); \pgfgetlastxy{\mechDLAngle}{\mechDLLength};
+      \pgfmathsetmacro{\mechDLStartValue}{\pgfkeysvalueof{/mech/distributed-load/start value}}
+      \pgfmathsetmacro{\mechDLEndValue}{\pgfkeysvalueof{/mech/distributed-load/end value}}
+      \pgfmathsetmacro{\mechDLArrowCount}{\pgfkeysvalueof{/mech/distributed-load/arrows}}
+      \begin{scope}[shift={(-start)},rotate=\mechDLAngle]
+        \pgfmathsetlengthmacro{\mechDLOffset}{\pgfkeysvalueof{/mech/distributed-load/offset}}
+        \pgfmathsetlengthmacro{\mechDLArrowheadLength}{\pgfkeysvalueof{/mech/distributed-load/arrowhead length}}
+        \pgfmathsetlengthmacro{\mechDLStartArrowLength}{abs(\mechDLStartValue)*\pgfkeysvalueof{/mech/distributed-load/height}}
+
+        \fill[mech/load fill]
+          (0,\mechDLOffset)
+          --(0,{\mechDLOffset+\mechDLStartValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+          --(\mechDLLength,{\mechDLOffset+\mechDLEndValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+          --(\mechDLLength,\mechDLOffset)
+          --cycle;
+
+        % Keep contour and first arrow continuous whenever the first arrow
+        % is long enough to accommodate its arrowhead. Otherwise draw only
+        % the contour and suppress the too-short arrow.
+        \ifdim\mechDLStartArrowLength<\mechDLArrowheadLength
+          \draw[\pgfkeysvalueof{/mech/distributed-load/style}]
+            (\mechDLLength,{\mechDLOffset+\mechDLEndValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+            --(0,{\mechDLOffset+\mechDLStartValue*\pgfkeysvalueof{/mech/distributed-load/height}});
+        \else
+          \draw[
+            \pgfkeysvalueof{/mech/distributed-load/style},
+            -{Latex[length=\pgfkeysvalueof{/mech/distributed-load/arrowhead length}]}
+          ]
+            (\mechDLLength,{\mechDLOffset+\mechDLEndValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+            --(0,{\mechDLOffset+\mechDLStartValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+            --(0,\mechDLOffset);
+        \fi
+
+        \foreach \mechDLIndex in {1,...,\mechDLArrowCount}{
+          \pgfmathsetmacro{\mechDLT}{\mechDLIndex/\mechDLArrowCount}
+          \pgfmathsetmacro{\mechDLValue}{\mechDLStartValue+(\mechDLEndValue-\mechDLStartValue)*\mechDLT}
+          \pgfmathsetlengthmacro{\mechDLArrowLength}{abs(\mechDLValue)*\pgfkeysvalueof{/mech/distributed-load/height}}
+
+          \ifdim\mechDLArrowLength<\mechDLArrowheadLength
+            % Suppress arrows that are shorter than their arrowhead.
+          \else
+            \draw[
+              \pgfkeysvalueof{/mech/distributed-load/style},
+              -{Latex[length=\pgfkeysvalueof{/mech/distributed-load/arrowhead length}]}
+            ]
+              ({\mechDLT*\mechDLLength},{\mechDLOffset+\mechDLValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+              --({\mechDLT*\mechDLLength},\mechDLOffset);
+          \fi
+        }
+
+        \node[mech/label,\pgfkeysvalueof{/mech/distributed-load/label position}]
+          at (\mechDLLength,{\mechDLOffset+\mechDLEndValue*\pgfkeysvalueof{/mech/distributed-load/height}})
+          {\pgfkeysvalueof{/mech/distributed-load/label}};
+      \end{scope}
+    }
+  },
+  pics/mech/distributed-load/.default={},
+}

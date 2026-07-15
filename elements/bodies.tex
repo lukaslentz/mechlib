@@ -1,0 +1,200 @@
+% =========================================================
+% mechlib/elements/bodies.tex
+% ATOMARE KOERPER: MASSE, PUNKTMASSE, WAGEN UND BALKEN
+% =========================================================
+% Die hier definierten TikZ-Pics stellen mechanische Grundkoerper bereit. Jedes
+% Pic besitzt eine eigene pgfkeys-Familie unter /mech/... und kann dadurch mit
+% benannten Optionen konfiguriert werden.
+%
+% Grundprinzip der API:
+%   \pic (name) at (<Ort>) {mech/<element>={<key>=<wert>,...}};
+%
+% Benannte Pics exportieren Koordinaten bzw. werden bei node-basierten Koerpern
+% auf den internen Shape-Knoten aliasiert. So koennen regulaere TikZ-Anker wie
+% (m1.east), (m1.north west) usw. direkt benutzt werden.
+%
+% Oeffentliche Pics in dieser Datei:
+%   mech/mass       rechteckiger Starrkoerper bzw. konzentrierte Masse
+%   mech/point-mass kreisfoermige Punktmasse
+%   mech/cart       Wagen mit zwei Raedern und optionalem Boden
+%   mech/beam       Balken zwischen zwei beliebigen Punkten
+% =========================================================
+\pgfkeys{
+  /mech/mass/.is family,
+  /mech/mass,
+  width/.initial=1.5cm,
+  height/.initial=1cm,
+  label/.initial=,
+  style/.initial=mech/body,
+}
+\tikzset{
+  pics/mech/mass/.style args={#1}{
+    code={
+      \pgfkeys{/mech/mass/.cd,#1}
+      \node[
+        \pgfkeysvalueof{/mech/mass/style},
+        minimum width=\pgfkeysvalueof{/mech/mass/width},
+        minimum height=\pgfkeysvalueof{/mech/mass/height},
+        inner sep=0pt
+      ] (-shape) at (0,0) {\pgfkeysvalueof{/mech/mass/label}};
+
+      % Named body pics behave like regular TikZ nodes.
+      % Example: \pic (m1) ... then (m1.east), (m1.south east), ...
+      \edef\mechPicName{\pgfkeysvalueof{/tikz/name prefix}}
+      \ifx\mechPicName\pgfutil@empty\else
+        \pgfnodealias{\mechPicName}{\mechPicName-shape}
+      \fi
+
+      \coordinate (-center) at (-shape.center);
+
+      % Three standardized connection levels on each vertical side.
+      % The shared \mechConnectionOffset is also used by fixed supports.
+      \coordinate (-west-upper)  at ($(-shape.west)+(0,\mechConnectionOffset)$);
+      \coordinate (-west-middle) at (-shape.west);
+      \coordinate (-west-lower)  at ($(-shape.west)+(0,-\mechConnectionOffset)$);
+
+      \coordinate (-east-upper)  at ($(-shape.east)+(0,\mechConnectionOffset)$);
+      \coordinate (-east-middle) at (-shape.east);
+      \coordinate (-east-lower)  at ($(-shape.east)+(0,-\mechConnectionOffset)$);
+
+      % Generic connection aliases
+      \coordinate (-connection-upper)  at (-east-upper);
+      \coordinate (-connection-middle) at (-east-middle);
+      \coordinate (-connection-lower)  at (-east-lower);
+
+      \coordinate (-north) at (-shape.north);
+      \coordinate (-south) at (-shape.south);
+    }
+  },
+  pics/mech/mass/.default={},
+}
+\pgfkeys{
+  /mech/point-mass/.is family,
+  /mech/point-mass,
+  radius/.initial=2.2mm,
+  label/.initial=,
+  style/.initial=mech/body,
+}
+\tikzset{
+  pics/mech/point-mass/.style args={#1}{
+    code={
+      \pgfkeys{/mech/point-mass/.cd,#1}
+      \edef\mechPointMassRadius{\pgfkeysvalueof{/mech/point-mass/radius}}
+      \edef\mechPointMassLabel{\pgfkeysvalueof{/mech/point-mass/label}}
+      \edef\mechPointMassStyle{\pgfkeysvalueof{/mech/point-mass/style}}
+      \node[
+        \mechPointMassStyle,
+        circle,
+        minimum size=2\mechPointMassRadius,
+        inner sep=0pt
+      ] (-shape) at (0,0) {\mechPointMassLabel};
+
+      \edef\mechPicName{\pgfkeysvalueof{/tikz/name prefix}}
+      \ifx\mechPicName\pgfutil@empty\else
+        \pgfnodealias{\mechPicName}{\mechPicName-shape}
+      \fi
+
+      \coordinate (-center) at (-shape.center);
+    }
+  },
+  pics/mech/point-mass/.default={},
+}
+% -------------------------------------------------------------------------
+% Wagen
+% -------------------------------------------------------------------------
+% Der Boolean "ground" wird als TeX-if gespeichert. Dadurch kann die optionale
+% Bodendarstellung ohne Stringvergleich ein- bzw. ausgeschaltet werden.
+\newif\ifmechCartGround
+\pgfkeys{
+  /mech/cart/.is family,
+  /mech/cart,
+  width/.initial=2cm,
+  height/.initial=1cm,
+  wheel radius/.initial=2mm,
+  label/.initial=,
+  ground/.is if=mechCartGround,
+  ground/.default=true,
+  ground=true,
+}
+\tikzset{
+  pics/mech/cart/.style args={#1}{
+    code={
+      \pgfkeys{/mech/cart/.cd,#1}
+      \edef\mechCartWidth{\pgfkeysvalueof{/mech/cart/width}}
+      \edef\mechCartHeight{\pgfkeysvalueof{/mech/cart/height}}
+      \edef\mechCartWheelRadius{\pgfkeysvalueof{/mech/cart/wheel radius}}
+      \node[
+        mech/body,
+        minimum width=\mechCartWidth,
+        minimum height=\mechCartHeight,
+        inner sep=0pt
+      ] (-shape) at (0,0) {\pgfkeysvalueof{/mech/cart/label}};
+
+      \edef\mechPicName{\pgfkeysvalueof{/tikz/name prefix}}
+      \ifx\mechPicName\pgfutil@empty\else
+        \pgfnodealias{\mechPicName}{\mechPicName-shape}
+      \fi
+
+      \coordinate (-center) at (-shape.center);
+      \coordinate (-west) at (-shape.west);
+      \coordinate (-east) at (-shape.east);
+      \coordinate (-north) at (-shape.north);
+      \coordinate (-south) at (-shape.south);
+      \draw[mech/body]
+        (-.3\mechCartWidth,-.5\mechCartHeight-\mechCartWheelRadius)
+        circle[radius=\mechCartWheelRadius];
+      \draw[mech/body]
+        (.3\mechCartWidth,-.5\mechCartHeight-\mechCartWheelRadius)
+        circle[radius=\mechCartWheelRadius];
+      \ifmechCartGround
+        \draw
+          (-.5\mechCartWidth,-.5\mechCartHeight-2\mechCartWheelRadius)
+          --
+          (.5\mechCartWidth,-.5\mechCartHeight-2\mechCartWheelRadius);
+        \fill[
+          pattern={Lines[angle=\mechHatchAngle,distance=1pt]},
+          pattern color=black
+        ]
+          (-.5\mechCartWidth,-.5\mechCartHeight-2\mechCartWheelRadius)
+          rectangle
+          (.5\mechCartWidth,-.5\mechCartHeight-2\mechCartWheelRadius-3pt);
+      \fi
+    }
+  },
+  pics/mech/cart/.default={},
+}
+\pgfkeys{
+  /mech/beam/.is family,
+  /mech/beam,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  height/.initial=3mm,
+  style/.initial=mech/body,
+}
+\tikzset{
+  pics/mech/beam/.style args={#1}{
+    code={
+      \pgfkeys{/mech/beam/.cd,#1}
+      \edef\mechBeamFrom{\pgfkeysvalueof{/mech/beam/from}}
+      \edef\mechBeamTo{\pgfkeysvalueof{/mech/beam/to}}
+      \edef\mechBeamHeight{\pgfkeysvalueof{/mech/beam/height}}
+      \edef\mechBeamStyle{\pgfkeysvalueof{/mech/beam/style}}
+      \path let
+        \p1=\mechBeamFrom,
+        \p2=\mechBeamTo,
+        \n1={veclen(\x2-\x1,\y2-\y1)},
+        \n2={(\y2-\y1)/\n1*\mechBeamHeight/2},
+        \n3={-(\x2-\x1)/\n1*\mechBeamHeight/2}
+      in
+        coordinate (-A) at (\x1+\n2,\y1+\n3)
+        coordinate (-B) at (\x2+\n2,\y2+\n3)
+        coordinate (-C) at (\x2-\n2,\y2-\n3)
+        coordinate (-D) at (\x1-\n2,\y1-\n3)
+        coordinate (-start) at (\x1,\y1)
+        coordinate (-end) at (\x2,\y2)
+        coordinate (-center) at ({(\x1+\x2)/2},{(\y1+\y2)/2});
+      \draw[\mechBeamStyle] (-A)--(-B)--(-C)--(-D)--cycle;
+    }
+  },
+  pics/mech/beam/.default={},
+}

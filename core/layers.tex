@@ -1,0 +1,14 @@
+% =========================================================
+% mechlib/core/layers.tex
+% ZEICHENEBENEN / PGF-LAYER
+% =========================================================
+% Fachwerkstaebe und andere hinterlegte Geometrien koennen auf dem Layer
+% "mech background" gezeichnet werden. Der normale TikZ-Layer "main" liegt
+% darueber. Dadurch koennen z. B. gefuellte Gelenke sauber vor den Staeben
+% erscheinen, ohne dass die Zeichenreihenfolge im Anwendungsdokument aufwendig
+% kontrolliert werden muss.
+% =========================================================
+% Zuerst wird der benannte Hintergrundlayer deklariert. Anschliessend wird die
+% globale Layerreihenfolge explizit gesetzt: Hintergrund vor Hauptlayer.
+\pgfdeclarelayer{mech background}
+\pgfsetlayers{mech background,main}

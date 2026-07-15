@@ -1,0 +1,50 @@
+% =========================================================
+% Beispiel: api-demo.tex
+% ZIEL: kompakte Demonstration der atomaren mechlib-API.
+%
+% Gezeigt werden zwei Massen, eine Einspannung, parallele Feder/Daempfer-
+% Anschluesse, eine Kopplungsfeder, eine Kraft, ein Koordinatensystem und eine
+% lineare Bemassung. Das Beispiel ist zugleich ein schneller Kompilationstest.
+% =========================================================
+% "standalone" schneidet die PDF auf die Bounding Box der TikZ-Grafik zu.
+\documentclass[tikz,border=5pt]{standalone}
+% Das Beispiel liegt in mechlib/examples; der Bibliotheksstamm liegt eine Ebene
+% hoeher. Der Loader verwendet diesen Pfad fuer alle internen \input-Aufrufe.
+\newcommand{\mechlibpath}{..}
+\input{../mechlib}
+\begin{document}
+% Ab hier wird ausschliesslich die oeffentliche mechlib-/TikZ-API verwendet.
+\begin{tikzpicture}
+  \pic (wall) at (0,0) {mech/fixed-support={angle=90}};
+  \pic (m1) at (3,0) {mech/mass={label=$m_1$}};
+  \pic (m2) at (7,0) {mech/mass={label=$m_2$}};
+
+  \pic {mech/spring={
+    from=(wall-connection-upper),
+    to=(m1.north west),
+    label=$c_1$
+  }};
+  \pic {mech/damper={
+    from=(wall-connection-lower),
+    to=(m1.south west),
+    label=$d_1$
+  }};
+
+  \pic {mech/spring={
+    from=(m1.east),
+    to=(m2.west),
+    label=$c_2$
+  }};
+
+  \pic at (m2.east) {
+    mech/force={angle=0,length=1.5cm,label=$F(t)$}
+  };
+
+  \pic at (0,-1.6) {
+    mech/coordinate-system={x label=$x$,y label=$y$}
+  };
+  \pic {
+    mech/dimension={from=(m1-center),to=(m2-center),label=$l$,offset=-1.2cm}
+  };
+\end{tikzpicture}
+\end{document}

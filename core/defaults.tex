@@ -1,0 +1,27 @@
+% =========================================================
+% mechlib/core/defaults.tex
+% GLOBALE STANDARDWERTE UND GEMEINSAME GEOMETRIEKONVENTIONEN
+% =========================================================
+% Hier stehen Werte, die von mehreren Modulen gemeinsam benutzt werden. Solche
+% Konstanten verhindern, dass geometrisch zusammengehoerige Elemente lokal mit
+% leicht unterschiedlichen Zahlen definiert werden.
+%
+% Beispiel: \mechConnectionOffset legt die vertikale Lage paralleler
+% Anschlussanker fest. Masse und Einspannung verwenden exakt denselben Wert;
+% dadurch liegen obere/mittlere/untere Anschluesse bei gleicher Mittelpunktlage
+% garantiert auf gleicher Hoehe.
+% =========================================================
+% Globale Schriftvorgabe fuer jedes TikZ-Bild. "append style" ergaenzt
+% vorhandene Bildstile, statt sie zu ueberschreiben.
+\tikzset{
+  every picture/.append style={font=\fontsize{10}{10}\selectfont},
+}
+
+% Standardwinkel fuer technische Bodenschraffuren.
+\def\mechHatchAngle{45}
+
+% Shared vertical distance of parallel connector anchors from the middle anchor.
+% Wall and mass use this exact value so upper/middle/lower are aligned whenever
+% their center points lie on the same horizontal line.
+% Gemeinsamer vertikaler Versatz fuer parallele Anschlussanker.
+\def\mechConnectionOffset{2.5mm}

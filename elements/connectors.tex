@@ -1,0 +1,75 @@
+% =========================================================
+% mechlib/elements/connectors.tex
+% ATOMARE VERBINDUNGSELEMENTE: FEDER UND DAEMPFER
+% =========================================================
+% Beide Elemente folgen derselben grundlegenden API: "from", "to" und "label".
+% Die Endpunkte koennen beliebige TikZ-Koordinaten oder exportierte Anker aus
+% anderen mechlib-Pics sein.
+%
+% Oeffentliche Pics:
+%   mech/spring  Zickzack-Feder entlang der Verbindungslinie
+%   mech/damper  Daempfer mit rechteckigem Daempferkoerper in Linienmitte
+%
+% Die Beschriftung wird "sloped" gezeichnet und folgt daher der Orientierung
+% des Verbindungselements. Ueber "label side" kann sie ober- oder unterhalb
+% der lokalen Verbindungslinie platziert werden.
+% =========================================================
+\pgfkeys{
+  /mech/spring/.is family,
+  /mech/spring,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  label/.initial=,
+  label side/.initial=above,
+  amplitude/.initial=2mm,
+  segment length/.initial=4mm,
+  style/.initial=mech/connector,
+}
+\tikzset{
+  pics/mech/spring/.style args={#1}{
+    code={
+      \pgfkeys{/mech/spring/.cd,#1}
+      \edef\mechSpringFrom{\pgfkeysvalueof{/mech/spring/from}}
+      \edef\mechSpringTo{\pgfkeysvalueof{/mech/spring/to}}
+      \draw[\pgfkeysvalueof{/mech/spring/style},
+        decorate,
+        decoration={zigzag,
+          segment length=\pgfkeysvalueof{/mech/spring/segment length},
+          amplitude=\pgfkeysvalueof{/mech/spring/amplitude}}]
+        \mechSpringFrom -- \mechSpringTo
+        node[midway,sloped,mech/label,outer sep=2mm,\pgfkeysvalueof{/mech/spring/label side}]
+        {\pgfkeysvalueof{/mech/spring/label}};
+    }
+  },
+  pics/mech/spring/.default={},
+}
+\pgfkeys{
+  /mech/damper/.is family,
+  /mech/damper,
+  from/.initial={(0,0)},
+  to/.initial={(1,0)},
+  label/.initial=,
+  label side/.initial=below,
+  body width/.initial=8mm,
+  body height/.initial=3mm,
+  style/.initial=mech/connector,
+}
+\tikzset{
+  pics/mech/damper/.style args={#1}{
+    code={
+      \pgfkeys{/mech/damper/.cd,#1}
+      \edef\mechDamperFrom{\pgfkeysvalueof{/mech/damper/from}}
+      \edef\mechDamperTo{\pgfkeysvalueof{/mech/damper/to}}
+      \draw[\pgfkeysvalueof{/mech/damper/style}]
+        \mechDamperFrom -- \mechDamperTo
+        node[midway,sloped,draw,fill=white,
+          minimum width=\pgfkeysvalueof{/mech/damper/body width},
+          minimum height=\pgfkeysvalueof{/mech/damper/body height},
+          inner sep=0pt] {};
+      \path \mechDamperFrom -- \mechDamperTo
+        node[midway,sloped,mech/label,outer sep=2mm,\pgfkeysvalueof{/mech/damper/label side}]
+        {\pgfkeysvalueof{/mech/damper/label}};
+    }
+  },
+  pics/mech/damper/.default={},
+}

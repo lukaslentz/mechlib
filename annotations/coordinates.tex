@@ -1,0 +1,67 @@
+% =========================================================
+% mechlib/annotations/coordinates.tex
+% KOORDINATENANNOTATIONEN: EINZELACHSE UND 2D-KOORDINATENSYSTEM
+% =========================================================
+% Die Pics dieser Datei zeichnen mathematische Bezugsachsen im Stil mech/axis.
+% Winkel werden in TikZ-Grad angegeben; Laengen sind regulaere TeX-Dimensionen.
+%
+% Oeffentliche Pics:
+%   mech/axis              einzelne gerichtete Achse
+%   mech/coordinate-system zwei unabhaengig orientierbare Achsen
+%
+% Beide Pics exportieren den lokalen Ursprung als "-origin". Bei einem benannten
+% Pic (cs) kann dieser z. B. als (cs-origin) referenziert werden.
+% =========================================================
+\pgfkeys{
+  /mech/axis/.is family,
+  /mech/axis,
+  label/.initial={$x$},
+  angle/.initial=0,
+  length/.initial=1cm,
+  direction/.initial=positive,
+}
+\tikzset{
+  pics/mech/axis/.style args={#1}{
+    code={
+      \pgfkeys{/mech/axis/.cd,#1}
+      \edef\mechAxisDirection{\pgfkeysvalueof{/mech/axis/direction}}
+      \def\mechAxisNegative{negative}
+      \ifx\mechAxisDirection\mechAxisNegative
+        \draw[mech/axis,{Latex[length=2mm]}-]
+          (0,0)--(\pgfkeysvalueof{/mech/axis/angle}:\pgfkeysvalueof{/mech/axis/length})
+          node[pos=1,anchor=west]{\pgfkeysvalueof{/mech/axis/label}};
+      \else
+        \draw[mech/axis,-{Latex[length=2mm]}]
+          (0,0)--(\pgfkeysvalueof{/mech/axis/angle}:\pgfkeysvalueof{/mech/axis/length})
+          node[pos=1,anchor=west]{\pgfkeysvalueof{/mech/axis/label}};
+      \fi
+      \coordinate (-origin) at (0,0);
+    }
+  },
+  pics/mech/axis/.default={},
+}
+\pgfkeys{
+  /mech/coordinate-system/.is family,
+  /mech/coordinate-system,
+  x label/.initial={$x$},
+  y label/.initial={$y$},
+  x angle/.initial=0,
+  y angle/.initial=90,
+  x length/.initial=1cm,
+  y length/.initial=1cm,
+}
+\tikzset{
+  pics/mech/coordinate-system/.style args={#1}{
+    code={
+      \pgfkeys{/mech/coordinate-system/.cd,#1}
+      \draw[mech/axis,-{Latex[length=2mm]}]
+        (0,0)--(\pgfkeysvalueof{/mech/coordinate-system/x angle}:\pgfkeysvalueof{/mech/coordinate-system/x length})
+        node[pos=1,anchor=west]{\pgfkeysvalueof{/mech/coordinate-system/x label}};
+      \draw[mech/axis,-{Latex[length=2mm]}]
+        (0,0)--(\pgfkeysvalueof{/mech/coordinate-system/y angle}:\pgfkeysvalueof{/mech/coordinate-system/y length})
+        node[pos=1,anchor=east]{\pgfkeysvalueof{/mech/coordinate-system/y label}};
+      \coordinate (-origin) at (0,0);
+    }
+  },
+  pics/mech/coordinate-system/.default={},
+}

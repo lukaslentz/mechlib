@@ -1,0 +1,492 @@
+% =========================================================
+% Legacy-Archiv: legacy-oscillators.tex
+% =========================================================
+% Diese Datei enthaelt zusammengesetzte Schwinger-Pics aus mechlib v1. Sie wird
+% vom zentralen Loader NICHT automatisch geladen und ist kein Bestandteil der
+% neuen atomaren mech/*-API.
+%
+% Zweck der Datei:
+%   - alte Abbildungen nachvollziehbar halten,
+%   - Geometrien und Parameterlisten bei der Migration als Referenz bewahren,
+%   - schrittweise Neuimplementierung mit mass/cart, spring und damper erlauben.
+%
+% WICHTIG: Die alten Pics verwenden historische Stil- und Pic-Namen wie
+% "wagen", "feder", "daempfer" und "x_cos". Diese Abhaengigkeiten muessen im
+% alten Dokument vorhanden sein. Neue Abbildungen sollen nicht auf diese API
+% aufbauen. Die vorhandenen Abschnittskommentare dokumentieren jeweils Pic-Name
+% und Parameterreihenfolge der einzelnen Legacy-Geometrien.
+% =========================================================
+\tikzset{
+	pics/einmassenschwinger_anregung/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+				% Schwinger
+			\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+			\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F$};
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+		}
+	}
+}
+% ------------------ Einmassenschwinger ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/einmassenschwinger_anregung_ungedaempft/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.5*\mh}
+			% Schwinger
+			\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+			\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F$};
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+		}
+	}
+}
+% ------------------ Einmassenschwinger ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/einmassenschwinger/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+		}
+	}
+}
+% ------------------ Zweimassenschwinger ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mf,$c_2$}};
+				\pic {daempfer={0,\mb,\md,$d_2$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mf,$c_3$}};
+				\pic {daempfer={0,\mb,\md,$d_3$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mk/.style args={#1,#2,#3,#4}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.5*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mf,$c_2$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mf,$c_3$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k mode  ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mk_mode/.style args={#1,#2,#3,#4}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.5*\mh}
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen_ob={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen_ob={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mf,$$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mf,$$}};
+			\end{scope}
+			\begin{scope}[on background layer]
+				\foreach \x in {0,0.25,...,5}{
+					\draw[gray!30, thin] (\x,1.3) -- (\x,-6.);
+				}
+			\end{scope}
+			\foreach \ys in {0,1.5,...,6}{
+				\begin{scope}[yshift=-\ys cm]
+					\draw[](0,\mh+2*\mr) -- (0,0) -- (5*\mb,0) --++ (0,\mh+2*\mr);
+					\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+					\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](-3pt,0) rectangle (5*\mb cm+3pt,-\mr);
+					\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black] (5*\mb cm,0) rectangle (5*\mb cm+3pt,\mh+2*\mr);
+			\end{scope}
+		}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mdk_nicht_durchdringend/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mfs,$c_1$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mf,$c_2$}};
+				\pic {daempfer={0,\mb,\md,$d_2$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mfs,$c_3$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mdk_rayleigh_1/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+				\pic {feder={0,\mb,\mfs,$c$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mf,$c$}};
+				\pic {daempfer={0,\mb,\md,$d$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mdk_rayleigh_2/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+				\pic {feder={0,\mb,\mfs,$c$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mfs,$c$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mdk_f_bsp1/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mf,$c$}};
+			\pic {daempfer={0,\mb,\md,$d$}};
+			\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+			\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F_1$};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+				\pic {feder={0,\mb,\mfs,$c$}};
+				\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+				\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F_2$};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mfs,$c$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Zweimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/zweimassenschwinger_mk_f/.style args={#1,#2,#3,#4}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+			\pic {feder={0,\mb,\mfs,$c$}};
+			\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+			\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F_1$};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.2*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.2*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m$}};
+				\pic {feder={0,\mb,\mfs,$c$}};
+				\draw (1.5*\mb,2*\mr+1.*\mh)--+(0,2*\mr);
+				\draw[red,-latex] (1.5*\mb,3*\mr+1.*\mh)--+(0.8,0)node[pos=.5,anchor=south]{$F_2$};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				\pic {feder={0,\mb,\mfs,$c$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ Dreimassenschwinger m-k ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/dreimassenschwinger_mdk_durchdringend/.style args={#1,#2,#3,#4,#5,#6}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\mfs}{2*\mr+0.5*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+			\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_1$};
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_2$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_2$}};
+				\pic {feder={0,\mb,\mfs,$c_2$}};
+			\end{scope}
+			\begin{scope}[xshift=4*\mb cm]
+				% Schwinger
+				\pic[rotate=180] at (1.5*\mb,2*\mr+1.3*\mh){x_cos={0.4cm,0.2cm,ucbblue}};
+				\node[ucbblue,anchor=south] at (1.5*\mb,2*\mr+1.3*\mh) {$x_3$};
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_3$}};
+				\pic {feder={0,\mb,\mfs,$c_3$}};
+			\end{scope}
+			\begin{scope}[xshift=6*\mb cm]
+				\pic {feder={0,\mb,\mfs,$c_4$}};
+			\end{scope}
+			\begin{scope}[xshift=7*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}
+% ------------------ n-massenschwinger ------------------
+% Pic: einmassenschwinger
+% Parameter: #1 Höhe, #2 Breite,#3 Name der Masse, #4 Federsteifigkeit, #5 Dämpfung
+\tikzset{
+	pics/nmassenschwinger/.style args={#1,#2,#3,#4,#5}{
+		code={
+			\pgfmathsetmacro{\mh}{0.8*#1}
+			\pgfmathsetmacro{\mb}{0.5*#2}
+			\pgfmathsetmacro{\mr}{0.1*#1}
+			\pgfmathsetmacro{\mf}{2*\mr+0.25*\mh}
+			\pgfmathsetmacro{\md}{2*\mr+0.75*\mh}
+			% Wand
+			\draw[](0,0) --++ (0,\mh+2*\mr);
+			\fill[pattern={Lines[angle=45, distance={1pt}]},pattern color=black](0,0) rectangle (-3pt,\mh+2*\mr);
+			% Schwinger
+			\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_1$}};
+			\pic {feder={0,\mb,\mf,$c_1$}};
+			\pic {daempfer={0,\mb,\md,$d_1$}};
+			\begin{scope}[xshift=2*\mb cm]
+				% Schwinger
+				\pic {feder={0,\mb,\mf,$c_2$}};
+				\pic {daempfer={0,\mb,\md,$d_2$}};
+			\end{scope}
+			\begin{scope}[xshift=5*\mb cm]
+				\pic at (\mb,0){wagen={\mh,\mb,\mr,$m_n$}};
+				\pic {feder={0,\mb,\mf,$c_{n}$}};
+				\pic {daempfer={0,\mb,\md,$d_{n}$}};
+			\end{scope}
+			\begin{scope}[xshift=7*\mb cm]
+				\pic {feder={0,\mb,\mf,$c_{n+1}$}};
+				\pic {daempfer={0,\mb,\md,$d_{n+1}$}};
+			\end{scope}
+			\begin{scope}[xshift=8*\mb cm]
+				% Wand
+				\draw[](0,0) --++ (0,\mh+2*\mr);
+				\fill[pattern={Lines[angle=-45, distance={1pt}]},pattern color=black](0,0) rectangle (3pt,\mh+2*\mr);
+			\end{scope}
+		}
+	}
+}

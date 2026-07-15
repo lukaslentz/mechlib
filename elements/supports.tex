@@ -1,0 +1,161 @@
+% =========================================================
+% mechlib/elements/supports.tex
+% ATOMARE LAGER: FESTLAGER, LOSLAGER UND EINSPANNUNG
+% =========================================================
+% Diese Datei kapselt die Lagergeometrie. Fest- und Loslager teilen sich die
+% Key-Familie /mech/support-common, damit Breite, Hoehe, Schraffur und Label
+% konsistent parametrisiert werden koennen.
+%
+% Oeffentliche Pics:
+%   mech/pinned-support Festlager / gelenkiges Lager
+%   mech/roller-support Loslager mit sichtbarem Abstand zum Boden
+%   mech/fixed-support  Einspannung, optional gedreht
+%
+% Aktuelle Fachwerk-Konvention:
+%   - Die Dreiecksspitze liegt exakt im Mittelpunkt des Gelenks (0,0).
+%   - Das Dreieck ist gegenueber der frueheren Version kompakt skaliert.
+%   - Bodenlinie und Schraffur verwenden dieselben x-Grenzen wie die
+%     Dreiecksgrundseite; beim Loslager wird die sichtbare Linienbreite explizit
+%     beruecksichtigt.
+%   - Das Gelenk selbst ist mit mechBodyColor gefuellt.
+%
+% Die pgfmathsetlengthmacro-Aufrufe sind absichtlich verwendet: LaTeX-Laengen
+% duerfen nicht durch Textersatz wie ".5\\macro" skaliert werden, da dies bei
+% expandierenden Dimensionsmakros zu sichtbarem Resttext (z. B. ".8mm") fuehren
+% kann. Alle abgeleiteten Abmessungen werden deshalb numerisch berechnet.
+% =========================================================
+\pgfkeys{
+  /mech/support-common/.is family,
+  /mech/support-common,
+  width/.initial=2.72mm,
+  height/.initial=2.24mm,
+  hatch angle/.initial=45,
+  label/.initial=,
+  label position/.initial=above,
+}
+\tikzset{
+  % -----------------------------------------------------------------------
+  % Festlager
+  % -----------------------------------------------------------------------
+  pics/mech/pinned-support/.style args={#1}{
+    code={
+      \pgfkeys{/mech/support-common/.cd,#1}
+      \edef\mechSupportWidth{\pgfkeysvalueof{/mech/support-common/width}}
+      \edef\mechSupportHeight{\pgfkeysvalueof{/mech/support-common/height}}
+      \edef\mechSupportHatch{\pgfkeysvalueof{/mech/support-common/hatch angle}}
+      \pgfmathsetlengthmacro{\mechSupportHalfWidth}{0.5*\mechSupportWidth}
+      % Die Dreieckskontur ragt an der Grundseite durch die halbe Linienbreite
+      % minimal ueber die geometrische Breite hinaus. Fuer identische sichtbare
+      % Breite wird die Bodenlinie daher um 0.3pt je Seite erweitert.
+      \pgfmathsetlengthmacro{\mechSupportGroundHalfWidth}{\mechSupportHalfWidth+0.3pt}
+      \pgfmathsetlengthmacro{\mechSupportApexY}{0mm}
+      \pgfmathsetlengthmacro{\mechSupportHatchDepth}{0.256*\mechSupportHeight}
+
+      \coordinate (-connection) at (0,0);
+      \coordinate (-center) at (0,0);
+
+      \draw[mech/support]
+        (-\mechSupportHalfWidth,-\mechSupportHeight)
+        -- (0,\mechSupportApexY)
+        -- (\mechSupportHalfWidth,-\mechSupportHeight)
+        -- cycle;
+      \draw[mech/body] (0,0) circle[radius=.6mm];
+      \draw[black,line width=.6pt,line cap=butt]
+        (-\mechSupportGroundHalfWidth,-\mechSupportHeight)
+        -- (\mechSupportGroundHalfWidth,-\mechSupportHeight);
+      \fill[
+        pattern={Lines[angle=\mechSupportHatch,distance=1pt]},
+        pattern color=black
+      ]
+        (-\mechSupportGroundHalfWidth,-\mechSupportHeight)
+        rectangle
+        (\mechSupportGroundHalfWidth,{-(\mechSupportHeight+\mechSupportHatchDepth)});
+
+      \node[\pgfkeysvalueof{/mech/support-common/label position}]
+        at (0,0) {\pgfkeysvalueof{/mech/support-common/label}};
+    }
+  },
+  pics/mech/pinned-support/.default={},
+  % -----------------------------------------------------------------------
+  % Loslager
+  % -----------------------------------------------------------------------
+  pics/mech/roller-support/.style args={#1}{
+    code={
+      \pgfkeys{/mech/support-common/.cd,#1}
+      \edef\mechSupportWidth{\pgfkeysvalueof{/mech/support-common/width}}
+      \edef\mechSupportHeight{\pgfkeysvalueof{/mech/support-common/height}}
+      \edef\mechSupportHatch{\pgfkeysvalueof{/mech/support-common/hatch angle}}
+      \pgfmathsetlengthmacro{\mechSupportHalfWidth}{0.5*\mechSupportWidth}
+      % The triangle outline extends by half its line width at the base corners.
+      % Add 0.3pt so the roller ground has the same visible total width.
+      \pgfmathsetlengthmacro{\mechSupportGroundHalfWidth}{\mechSupportHalfWidth+0.3pt}
+      \pgfmathsetlengthmacro{\mechSupportApexY}{0mm}
+      \pgfmathsetlengthmacro{\mechSupportRollerGap}{0.272*\mechSupportHeight}
+      \pgfmathsetlengthmacro{\mechSupportHatchDepth}{0.256*\mechSupportHeight}
+      \pgfmathsetlengthmacro{\mechSupportGroundY}{\mechSupportHeight+\mechSupportRollerGap}
+
+      \coordinate (-connection) at (0,0);
+      \coordinate (-center) at (0,0);
+
+      \draw[mech/support]
+        (-\mechSupportHalfWidth,-\mechSupportHeight)
+        -- (0,\mechSupportApexY)
+        -- (\mechSupportHalfWidth,-\mechSupportHeight)
+        -- cycle;
+      \draw[mech/body] (0,0) circle[radius=.6mm];
+      \draw[black,line width=.6pt,line cap=butt]
+        (-\mechSupportGroundHalfWidth,-\mechSupportGroundY)
+        -- (\mechSupportGroundHalfWidth,-\mechSupportGroundY);
+      \fill[
+        pattern={Lines[angle=\mechSupportHatch,distance=1pt]},
+        pattern color=black
+      ]
+        (-\mechSupportGroundHalfWidth,-\mechSupportGroundY)
+        rectangle
+        (\mechSupportGroundHalfWidth,{-(\mechSupportGroundY+\mechSupportHatchDepth)});
+
+      \node[\pgfkeysvalueof{/mech/support-common/label position}]
+        at (0,0) {\pgfkeysvalueof{/mech/support-common/label}};
+    }
+  },
+  pics/mech/roller-support/.default={},
+}
+\pgfkeys{
+  /mech/fixed-support/.is family,
+  /mech/fixed-support,
+  width/.initial=1cm,
+  depth/.initial=1.5mm,
+  hatch angle/.initial=45,
+  angle/.initial=0,
+  label/.initial=,
+}
+\tikzset{
+  pics/mech/fixed-support/.style args={#1}{
+    code={
+      \pgfkeys{/mech/fixed-support/.cd,#1}
+      \edef\mechFixedWidth{\pgfkeysvalueof{/mech/fixed-support/width}}
+      \edef\mechFixedDepth{\pgfkeysvalueof{/mech/fixed-support/depth}}
+      \edef\mechFixedHatch{\pgfkeysvalueof{/mech/fixed-support/hatch angle}}
+      \edef\mechFixedAngle{\pgfkeysvalueof{/mech/fixed-support/angle}}
+
+      \coordinate (-center) at (0,0);
+      \coordinate (-connection-upper)  at (0,\mechConnectionOffset);
+      \coordinate (-connection-middle) at (0,0);
+      \coordinate (-connection-lower)  at (0,-\mechConnectionOffset);
+
+      \begin{scope}[rotate=\mechFixedAngle]
+        \draw[mech/body,fill=none] (-.5\mechFixedWidth,0)--(.5\mechFixedWidth,0);
+        \fill[
+          pattern={Lines[angle=\mechFixedHatch,distance={3pt/sqrt(2)}]},
+          pattern color=black
+        ]
+          (-.5\mechFixedWidth,0)
+          rectangle
+          (.5\mechFixedWidth,\mechFixedDepth);
+      \end{scope}
+
+      \node[above] at (0,0) {\pgfkeysvalueof{/mech/fixed-support/label}};
+    }
+  },
+  pics/mech/fixed-support/.default={},
+}

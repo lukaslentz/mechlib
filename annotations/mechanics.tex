@@ -1,0 +1,69 @@
+% =========================================================
+% mechlib/annotations/mechanics.tex
+% MECHANISCHE ANNOTATIONEN: SCHNITTGROESSEN UND LAGERREAKTIONEN
+% =========================================================
+% Die Pics kombinieren mehrere elementare Lastsymbole zu haeufig benoetigten
+% mechanischen Symbolgruppen. Farben und Pfeilgestaltung folgen mech/load.
+%
+% Oeffentliche Pics:
+%   mech/internal-forces  Normalkraft N, Querkraft Q und Moment M am Schnitt
+%   mech/fixed-reactions  horizontale/vertikale Reaktion und Einspannmoment
+%
+% Bei mech/internal-forces steuert "side=right|left" die Vorzeichenrichtung
+% aller drei Schnittgroessen konsistent. Das Moment wird dazu intern als
+% mech/moment mit passender Drehrichtung wiederverwendet.
+% =========================================================
+\pgfkeys{
+  /mech/internal-forces/.is family,
+  /mech/internal-forces,
+  normal/.initial={$N$},
+  shear/.initial={$Q$},
+  moment/.initial={$M$},
+  length/.initial=7mm,
+  side/.is choice,
+  side/right/.code={\def\mechIFSign{1}},
+  side/left/.code={\def\mechIFSign{-1}},
+  side=right,
+}
+\tikzset{
+  pics/mech/internal-forces/.style args={#1}{
+    code={
+      \pgfkeys{/mech/internal-forces/.cd,side=right,#1}
+      \edef\mechIFLength{\pgfkeysvalueof{/mech/internal-forces/length}}
+      \draw[mech/load,-{Latex[length=2mm]}]
+        (0,0)--({\mechIFSign*\mechIFLength},0)
+        node[pos=1,anchor=west]{\pgfkeysvalueof{/mech/internal-forces/normal}};
+      \draw[mech/load,-{Latex[length=2mm]}]
+        (0,0)--(0,{-.8*\mechIFSign*\mechIFLength})
+        node[pos=1,anchor=west]{\pgfkeysvalueof{/mech/internal-forces/shear}};
+      \ifnum\mechIFSign=1
+        \pic {mech/moment={direction=ccw,radius=.55\mechIFLength,label=\pgfkeysvalueof{/mech/internal-forces/moment}}};
+      \else
+        \pic {mech/moment={direction=cw,radius=.55\mechIFLength,label=\pgfkeysvalueof{/mech/internal-forces/moment}}};
+      \fi
+    }
+  },
+  pics/mech/internal-forces/.default={},
+}
+\pgfkeys{
+  /mech/fixed-reactions/.is family,
+  /mech/fixed-reactions,
+  x/.initial={$A_x$},
+  y/.initial={$A_y$},
+  moment/.initial={$M_A$},
+  length/.initial=7mm,
+}
+\tikzset{
+  pics/mech/fixed-reactions/.style args={#1}{
+    code={
+      \pgfkeys{/mech/fixed-reactions/.cd,#1}
+      \edef\mechReactionLength{\pgfkeysvalueof{/mech/fixed-reactions/length}}
+      \draw[mech/load,-{Latex[length=2mm]}] (-\mechReactionLength,0)--(0,0)
+        node[pos=0,anchor=east]{\pgfkeysvalueof{/mech/fixed-reactions/x}};
+      \draw[mech/load,-{Latex[length=2mm]}] (0,.7\mechReactionLength)--(0,-.3\mechReactionLength)
+        node[pos=0,anchor=south]{\pgfkeysvalueof{/mech/fixed-reactions/y}};
+      \pic {mech/moment={direction=ccw,radius=.45\mechReactionLength,label=\pgfkeysvalueof{/mech/fixed-reactions/moment}}};
+    }
+  },
+  pics/mech/fixed-reactions/.default={},
+}

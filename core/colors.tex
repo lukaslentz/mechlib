@@ -1,0 +1,28 @@
+% =========================================================
+% mechlib/core/colors.tex
+% ZENTRALE FARBPALETTE
+% =========================================================
+% Alle bibliotheksweiten Farben werden ausschliesslich hier definiert. Dadurch
+% kann der visuelle Charakter der gesamten mechlib an einer Stelle angepasst
+% werden, ohne einzelne Elemente zu veraendern.
+%
+% Konvention:
+%   mechBodyColor    Fuellung allgemeiner Koerper und Fachwerkgelenke
+%   mechSupportColor Fuellung von Lagerkoerpern
+%   mechLoadColor    Kraefte, Momente und Streckenlasten
+%   mechAxisColor    Achsen und Koordinatensysteme
+%   mechRodColor     historische Stabfarbe; aktuelle Fachwerkstaebe sind schwarz
+%
+% Die Namen sind Teil der internen visuellen API und sollten bevorzugt statt
+% harter RGB-Werte in den Elementdateien verwendet werden.
+% =========================================================
+% -------------------------------------------------------------------------
+% Farbdefinitionen
+% -------------------------------------------------------------------------
+% RGB wird bewusst explizit verwendet, damit die Darstellung unabhaengig von
+% Dokumentklassen und externen Farbmodellen reproduzierbar bleibt.
+\definecolor{mechBodyColor}{RGB}{180,180,180}
+\definecolor{mechSupportColor}{RGB}{205,205,205}
+\definecolor{mechLoadColor}{RGB}{178,25,25}
+\definecolor{mechAxisColor}{RGB}{6,13,141}
+\definecolor{mechRodColor}{RGB}{130,130,130}
